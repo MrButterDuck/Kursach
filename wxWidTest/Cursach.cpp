@@ -18,7 +18,7 @@ bool Cursach::OnInit() {
 		file.open(path + "Orders.txt");
 		file.close();
 	}
-	MainFrame* mainFrame = new MainFrame("Õà÷ó âàôëè");
+	MainFrame* mainFrame = new MainFrame("ÂÀÔËß");
 	mainFrame->Center();
 	mainFrame->Maximize();
 	mainFrame->SetIcon(wxIcon(waffle_icon));

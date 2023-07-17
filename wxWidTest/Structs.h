@@ -3,6 +3,7 @@
 #include "DataTypes.h"
 #include <memory.h>
 #include <typeinfo>
+#include <queue>
 
 //========================================СПИСКИ========================================//
 template<typename Type>
@@ -124,12 +125,14 @@ public:
 template< typename valueType>
 struct Node
 {
-    CycleList<valueType> *value;
-    std::string key;
-    struct Node< valueType>* left;
-    struct Node< valueType>* right;
-    char balance;
-    Node(std::string newKey, valueType newValue) { key = newKey, value = new CycleList<valueType>(); value->push_back(newValue); left = nullptr; right = nullptr; balance = 0; }
+    Node* leftChild;
+    Node* rightChild;
+    int balanceFactor;
+    CycleList<valueType>* value;
+    std::string head;
+    Node(std::string newKey, valueType newValue) { head = newKey; value = new CycleList<valueType>(); value->push_back(newValue); leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
+    // список
+    Node(std::string newKey, CycleList<valueType>* newValue) { head = newKey; value = newValue; leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
 };
 
 template< typename valueType>
@@ -147,12 +150,14 @@ struct treeNode {
 template< typename valueType>
 struct elem
 {
-    std::string key;
+    elem* leftChild;
+    elem* rightChild;
+    int balanceFactor;
     TwoPointList<valueType>* value;
-    struct elem< valueType>* left;
-    struct elem< valueType>* right;
-    char balance;
-    elem(std::string newKey, valueType newValue) { this->key = newKey; value = new TwoPointList<valueType>(); value->push_back(newValue); left = nullptr; right = nullptr; balance = 0; }
+    std::string head;
+    elem(std::string newKey, valueType newValue) { head = newKey; value = new TwoPointList<valueType>(); value->push_back(newValue); leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
+    // список
+    elem(std::string newKey, TwoPointList<valueType>* newValue) { head = newKey; value = newValue; leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
 };
 
 
@@ -160,15 +165,16 @@ template<typename valueType>
 class AvlTree1 {
 private:
     Node<valueType>* tree1;
-    bool h;
-    void BalanceL(Node<valueType>*& root);
-    void BalanceR(Node<valueType>*& root);
-    void Del(Node<valueType>*& r, Node< valueType>*& q);
-    void AddRec(Node<valueType>*& root, std::string key, valueType value);
-    void DeleteRec(Node<valueType>*& root, std::string key, valueType value);
-    void SearchElementRec(Node< valueType>* root, std::string key, Node< valueType>*& res);
-    void PrintTreeRec(Node<valueType>* root, int h, std::string &line);
-    void MemoryClear(Node<valueType>*& root);
+    bool heightChanged;
+    void addNode(Node< valueType>*& pointer, std::string key, valueType value);
+    void printTree(Node<valueType>* root, int h, std::string& line);
+    void _deleteTree(Node<valueType>*& pointer);
+    Node< valueType>* deleteTree(Node<valueType>*& root);
+    void _del_balanceLeft(Node<valueType>*& node);
+    void _del_balanceRight(Node<valueType>*& node);
+    void _delWhenTwoChild(Node<valueType>*& node, Node<valueType>*& delNode);
+    void delNode(Node<valueType>*& pointer, std::string key, valueType value);
+    void searchTreeNode(Node<valueType>* pointer, std::string key, Node<valueType>*& res);
 
 public:
     AvlTree1();
@@ -207,15 +213,16 @@ template<typename valueType>
 class AvlTree3 {
 private:
     elem< valueType>* tree1;
-    bool h;
-    void BalanceL(elem<valueType>*& root);
-    void BalanceR(elem<valueType>*& root);
-    void Del(elem< valueType>*& r, elem< valueType>*& q);
-    void AddRec(elem< valueType>*& root, std::string key, valueType value);
-    void DeleteRec(elem< valueType>*& root, std::string key, valueType value);
-    void SearchElementRec(elem< valueType>* root, std::string key,  elem< valueType>*& res);
-    void PrintTreeRec(elem< valueType>* root, int h, std::string &line);
-    void MemoryClear(elem< valueType>*& root);
+    bool heightChanged;
+    void addNode(elem< valueType>*& pointer, std::string key, valueType value);
+    void printTree(elem<valueType>* root, int h, std::string& line);
+    void _deleteTree(elem<valueType>*& pointer);
+    elem< valueType>* deleteTree(elem<valueType>*& root);
+    void _del_balanceLeft(elem<valueType>*& node);
+    void _del_balanceRight(elem<valueType>*& node);
+    void _delWhenTwoChild(elem<valueType>*& node, elem<valueType>*& delNode);
+    void delNode(elem<valueType>*& pointer, std::string key, valueType value);
+    void searchTreeNode(elem<valueType>* pointer, std::string key, elem<valueType>*& res);
 
 public:
     AvlTree3();
@@ -417,9 +424,9 @@ template<typename Type> bool TwoPointList<Type>::push_back(Type data) {
             }
             else if (buffer->data > data) {
                 node1<Type>* newData = new node1<Type>(data, buffer, buffer->past);
-                buffer->past = newData;
                 if (head == buffer)head = newData;
                 else buffer->past->next = newData;
+                buffer->past = newData;
                 this->count++;
                 return true;
             }
@@ -441,6 +448,7 @@ template<typename Type> void TwoPointList<Type>::delete_element(Type data) {
             node1<Type>* del = buffer;
             if(del != head)buffer->past->next = buffer->next;
             else if (del == head)head = del->next;
+            if (buffer->next)buffer->next->past = buffer->past;
             delete del;
             this->count--;
         }
@@ -586,302 +594,306 @@ template<typename Type>OnePointList<Type>::~OnePointList() {
     }
 }
 
-//========================================ДЕРЕВЬЯ========================================//
-template< typename valueType> AvlTree1< valueType>::AvlTree1() {
+//========================================ДЕРЕВО 1========================================//
+
+template<typename valueType> AvlTree1< valueType>::AvlTree1() {
     this->tree1 = nullptr;
-    this->h = false;
+    this->heightChanged = false;
 }
 
-template<typename valueType>  void AvlTree1< valueType>::BalanceL(Node<valueType>*& root) {
-    Node< valueType>* p1;
-    Node< valueType>* p2;
-    char bal1, bal2;
-    switch (root->balance)
+template< typename valueType> void AvlTree1< valueType>::printTree(Node< valueType>* root, int h, std::string& line) {
+    if (root)
     {
-    case -1:
-        root->balance = 0;
-        break;
-    case 0:
-        root->balance = 1;
-        h = false;
-        break;
-    case 1:
-        p1 = root->right; bal1 = p1->balance;
-        if (bal1 >= 0)
-        {
-            root->right = p1->left;
-            p1->left = root;
-            if (bal1 == 0) {
-                root->balance = 1;
-                p1->balance = -1;
-                h = false;
-            }
-            else
-            {
-                root->balance = 0;
-                p1->balance = 0;
-            }
-            root = p1;
-        }
-        else
-        {
-            p2 = p1->left; bal2 = p2->balance;
-            p1->left = p2->right; p2->right = p1;
-            root->right = p2->left; p2->left = root;
-            if (bal2 == 1) root->balance = -1;
-            else root->balance = 0;
-            if (bal2 == -1) p1->balance = 1;
-            else p1->balance = 0;
-            root = p2;
-            p2->balance = 0;
-        }
-
+        printTree(root->rightChild, h + 4, line);
+        for (int i = 1; i <= h; i++)line += " ";
+        line += root->head;
+        line += "[";
+        root->value->print(line);
+        line += "]\n";
+        printTree(root->leftChild, h + 4, line);
     }
 }
 
-template<typename valueType>  void AvlTree1< valueType>::BalanceR(Node<valueType>*& root) {
-    Node< valueType>* p1;
-    Node< valueType>* p2;
-    char bal1, bal2;
-    switch (root->balance)
-    {
-    case 1:
-        root->balance = 0;
-        break;
-    case 0:
-        root->balance = 1;
-        h = false;
-        break;
-    case -1:
-        p1 = root->left; bal1 = p1->balance;
-        if (bal1 <= 0)
-        {
-            root->left = p1->right;
-            p1->right = root;
-            if (bal1 == 0) {
-                root->balance = -1;
-                p1->balance = 1;
-                h = false;
+template<typename valueType> void AvlTree1< valueType>::addNode(Node< valueType>*& pointer, std::string key, valueType value) {
+    Node< valueType>* pointer1, * pointer2;
+    if (pointer == nullptr) {
+        heightChanged = true;
+        pointer = new Node< valueType>(key, value);
+
+    }
+    else if (pointer->head > key) {
+        addNode(pointer->leftChild, key, value);
+        if (heightChanged) { // выросла левая часть 
+            if (pointer->balanceFactor == 1) {
+                pointer->balanceFactor = 0;
+                heightChanged = false;
             }
-            else
-            {
-                root->balance = 0;
-                p1->balance = 0;
+            else if (pointer->balanceFactor == 0) {
+                pointer->balanceFactor = -1;
             }
-            root = p1;
+            else {
+                pointer2 = new Node< valueType>(key, value);
+                pointer1 = new Node< valueType>(key, value);
+                pointer1 = pointer->leftChild;
+                if (pointer1->balanceFactor == -1) { //одиночная LL-ротация
+                    pointer->leftChild = pointer1->rightChild;
+                    pointer1->rightChild = pointer;
+                    pointer->balanceFactor = 0;
+                    pointer = pointer1;
+                }
+                else { //двойная LR ротация
+                    pointer2 = pointer1->rightChild;
+                    pointer1->rightChild = pointer2->leftChild;
+                    pointer2->leftChild = pointer1;
+                    pointer->leftChild = pointer2->rightChild;
+                    pointer2->rightChild = pointer;
+                    if (pointer2->balanceFactor == -1) pointer->balanceFactor = 1; else pointer->balanceFactor = 0;
+                    if (pointer2->balanceFactor == 1) pointer1->balanceFactor = -1; else pointer1->balanceFactor = 0;
+                    pointer = pointer2;
+                }
+                pointer->balanceFactor = 0;
+                heightChanged = false;
+            }
         }
-        else
-        {
-            p2 = p1->right; bal2 = p2->balance;
-            p1->right = p2->left; p2->left = p1;
-            root->left = p2->right; p2->right = root;
-            if (bal2 == -1) root->balance = 1;
-            else root->balance = 0;
-            if (bal2 == 1) p1->balance = -1;
-            else p1->balance = 0;
-            root = p2;
-            p2->balance = 0;
+    }
+    else if (pointer->head < key) {
+        addNode(pointer->rightChild, key, value);
+        if (heightChanged) { //выросла правая часть 
+            if (pointer->balanceFactor == -1) {
+                pointer->balanceFactor = 0;
+                heightChanged = false;
+            }
+            else if (pointer->balanceFactor == 0) {
+                pointer->balanceFactor = 1;
+            }
+            else {
+                pointer2 = new Node< valueType>(key, value);
+                pointer1 = new Node< valueType>(key, value);
+                pointer1 = pointer->rightChild;
+                if (pointer1->balanceFactor == 1) { // одиночаня RR ротация 
+                    pointer->rightChild = pointer1->leftChild;
+                    pointer1->leftChild = pointer;
+                    pointer->balanceFactor = 0;
+                    pointer = pointer1;
+                }
+                else { // двойная RL ротация 
+                    pointer2 = pointer1->leftChild;
+                    pointer1->leftChild = pointer2->rightChild;
+                    pointer2->rightChild = pointer1;
+                    pointer->rightChild = pointer2->leftChild;
+                    pointer2->leftChild = pointer;
+                    if (pointer2->balanceFactor == 1) pointer->balanceFactor = -1; else pointer->balanceFactor = 0;
+                    if (pointer2->balanceFactor == -1) pointer1->balanceFactor = 1; else pointer1->balanceFactor = 0;
+                    pointer = pointer2;
+                }
+                pointer->balanceFactor = 0;
+                heightChanged = false;
+            }
         }
 
+    }
+    else {
+        pointer->value->push_back(value);
+        heightChanged = false;
     }
 }
 
-template< typename valueType>  void AvlTree1< valueType>::AddRec(Node< valueType>*& root, std::string key, valueType value) {
-    Node< valueType>* p1;
-    Node< valueType>* p2;
-    if (!root)
-    {
-        root = new Node<valueType>(key, value);
-        h = true;
+template< typename valueType> void AvlTree1< valueType>::_deleteTree(Node< valueType>*& pointer) {
+    if (pointer) {
+        if (pointer->leftChild != nullptr) {
+            _deleteTree(pointer->leftChild);
+        }
+        if (pointer->rightChild != nullptr) {
+            _deleteTree(pointer->rightChild);
+        }
+        delete pointer;
     }
-    else if (root->key > key)
-    {
-        AddRec(root->left, key, value);
-        if (h)
-        {
-            if (root->balance == 1) { root->balance = 0; h = false; }
-            else if (root->balance == 0) { root->balance = -1; }
-            else
-            {
-                p1 = root->left;
-                if (p1->balance == -1)
-                {
-                    root->left = p1->right;
-                    p1->right = root;
-                    root->balance = 0;
-                    root = p1;
-                }
-                else
-                {
-                    p2 = p1->right;
-                    p1->right = p2->left;
-                    p2->left = p1;
-                    root->left = p2->right;
-                    p2->right = root;
-                    if (p2->balance == -1)
-                    {
-                        root->balance = 1;
-                    }
-                    else
-                    {
-                        root->balance = 0;
-                    }
-                    if (p2->balance == 1)
-                    {
-                        p1->balance = -1;
-                    }
-                    else
-                    {
-                        p1->balance = 0;
-                    }
-                    root = p2;
-                }
-                root->balance = 0;
-                h = false;
+}
+
+template<typename valueType> Node< valueType>* AvlTree1< valueType>::deleteTree(Node< valueType>*& root) {
+    _deleteTree(root);
+    root = nullptr;
+    return root;
+}
+
+template< typename valueType> void AvlTree1< valueType>::_del_balanceLeft(Node< valueType>*& node) {
+    Node< valueType>* pointer1, * pointer2;
+    if (node->balanceFactor == -1) node->balanceFactor = 0;
+    else if (node->balanceFactor == 0) {
+        node->balanceFactor = 1;
+        heightChanged = false;
+    }
+    else {
+        pointer1 = new Node< valueType>(node->head, node->value);
+        pointer1 = node->rightChild;
+        if (pointer1->balanceFactor >= 0) {
+            node->rightChild = pointer1->leftChild;
+            pointer1->leftChild = node;
+            if (pointer1->balanceFactor == 0) {
+                node->balanceFactor = 1;
+                pointer1->balanceFactor = -1;
+                heightChanged = false;
             }
+            else {
+                node->balanceFactor = 0;
+                pointer1->balanceFactor = 0;
+            }
+            node = pointer1;
+        }
+        else {
+            pointer2 = new Node< valueType>(node->head, node->value);
+            pointer2 = pointer1->leftChild;
+            pointer1->leftChild = pointer2->rightChild;
+            pointer2->rightChild = pointer1;
+            node->rightChild = pointer2->leftChild;
+            pointer2->leftChild = node;
+            if (pointer2->balanceFactor == 1) {
+                node->balanceFactor = -1;
+            }
+            else {
+                node->balanceFactor = 0;
+            }
+            if (pointer2->balanceFactor == -1) {
+                pointer1->balanceFactor = 1;
+            }
+            else {
+                pointer1->balanceFactor = 0;
+            }
+            node = pointer2;
+            pointer2->balanceFactor = 0;
         }
     }
-    else if (root->key < key)
-    {
-        AddRec(root->right, key, value);
-        if (h)
-        {
-            if (root->balance == -1) { root->balance = 0; h = false; }
-            else if (root->balance == 0) { root->balance = 1; }
-            else
-            {
-                p1 = root->right;
-                if (p1->balance == 1)
-                {
-                    root->right = p1->left;
-                    p1->left = root;
-                    root->balance = 0;
-                    root = p1;
-                }
-                else
-                {
-                    p2 = p1->left;
-                    p1->left = p2->right;
-                    p2->right = p1;
-                    root->right = p2->left;
-                    p2->left = root;
+}
 
-                    if (p2->balance == 1)
-                    {
-                        root->balance = -1;
-                    }
-                    else
-                    {
-                        root->balance = 0;
-                    }
-                    if (p2->balance == -1)
-                    {
-                        p1->balance = 1;
-                    }
-                    else
-                    {
-                        p1->balance = 0;
-                    }
-                    root = p2;
-                }
-
-                root->balance = 0;
-                h = false;
-
+template< typename valueType> void AvlTree1< valueType>::_del_balanceRight(Node< valueType>*& node) {
+    Node< valueType>* pointer1, * pointer2;
+    if (node->balanceFactor == 1) node->balanceFactor = 0;
+    else if (node->balanceFactor == 0) {
+        node->balanceFactor = -1;
+        heightChanged = false;
+    }
+    else {
+        pointer1 = new Node< valueType>(node->head, node->value);
+        pointer1 = node->leftChild;
+        if (pointer1->balanceFactor <= 0) {
+            node->leftChild = pointer1->rightChild;
+            pointer1->rightChild = node;
+            if (pointer1->balanceFactor == 0) {
+                node->balanceFactor = -1;
+                pointer1->balanceFactor = 1;
+                heightChanged = false;
             }
+            else {
+                node->balanceFactor = 0;
+                pointer1->balanceFactor = 0;
+            }
+            node = pointer1;
+        }
+        else {
+            pointer2 = new Node< valueType>(node->head, node->value);
+            pointer2 = pointer1->rightChild;
+            pointer1->rightChild = pointer2->leftChild;
+            pointer2->leftChild = pointer1;
+            node->leftChild = pointer2->rightChild;
+            pointer2->rightChild = node;
+            if (pointer2->balanceFactor == -1) node->balanceFactor = 1; else node->balanceFactor = 0;
+            if (pointer2->balanceFactor == 1) pointer1->balanceFactor = -1; else pointer1->balanceFactor = 0;
+            node = pointer2;
+            pointer2->balanceFactor = 0;
+        }
+    }
+}
+
+template< typename valueType> void AvlTree1< valueType>::_delWhenTwoChild(Node< valueType>*& node, Node< valueType>*& delNode) {
+    if (node->rightChild != nullptr) {
+        _delWhenTwoChild(node->rightChild, delNode);
+        if (heightChanged) {
+            _del_balanceRight(node);
         }
     }
     else {
-        root->value->push_back(value);
+        delNode->head = node->head;
+        delNode->value = node->value;
+        delNode = node;
+        node = node->leftChild;
+        heightChanged = true;
+
     }
 }
 
-template< typename valueType>  void AvlTree1< valueType>::Del(Node< valueType>*& r, Node< valueType>*& q) {
-    if (r->right)
-    {
-        Del(r->right, q);
-        if (h)BalanceR(r);
-    }
-    else
-    {
-        q->key = r->key;
-        q->value = r->value;
-        q = r;
-        r = r->left;
-        h = true;
-    }
-}
+template< typename valueType> void AvlTree1< valueType>::delNode(Node< valueType>*& pointer, std::string key, valueType value) {
+    Node< valueType>* temp = nullptr;
+    if (pointer == nullptr);//нет в дереве
+    else if (pointer->head > key) {// > 
+        delNode(pointer->leftChild, key, value);
+        if (heightChanged) {
+            _del_balanceLeft(pointer);
+        }
 
-template< typename valueType> void AvlTree1< valueType>::DeleteRec(Node< valueType>*& root, std::string key, valueType value) {
-    Node< valueType>* q;
-    if (!root) {}
-    else if (root->key > key)
-    {
-        DeleteRec(root->left, key, value);
-        if (h) BalanceL(root);
     }
-    else if (root->key < key)
-    {
-        DeleteRec(root->right, key, value);
-        if (h) BalanceR(root);
+    else if (pointer->head < key) {// <
+        delNode(pointer->rightChild, key, value);
+        if (heightChanged) {
+            _del_balanceRight(pointer);
+        }
     }
-    else
-    {
-        if (this->tree1->value->getCount() > 1)this->tree1->value->delete_by_id(value);
+    else {
+        if (pointer->value->getCount() > 1)pointer->value->delete_by_value(value);
         else {
-            q = root;
-            if (!q->right) { root = q->left; h = true; }
-            else if (!q->left) { root = q->right; h = true; }
-            else
-            {
-                Del(q->left, q);
-                if (h) BalanceL(root);
+            temp = pointer;
+            if (temp->rightChild == nullptr) {
+                pointer = temp->leftChild;
+                heightChanged = true;
+                delete temp;
+                temp = nullptr;
+            }
+            else if (temp->leftChild == nullptr) {
+
+                pointer = temp->rightChild;
+                heightChanged = true;
+                delete temp;
+                temp = nullptr;
+            }
+            else {
+                _delWhenTwoChild(temp->leftChild, temp);
+                if (heightChanged) _del_balanceLeft(pointer);
             }
         }
     }
 }
 
-template<typename valueType> void AvlTree1< valueType>::SearchElementRec(Node< valueType>* root, std::string key,  Node< valueType>*& res) {
-    if (root->key == key)res = root;
-    if (root->left)SearchElementRec(root->left, key,  res);
-    if (root->right)SearchElementRec(root->right, key,  res);
-}
-
-template< typename valueType>  void AvlTree1< valueType>::PrintTreeRec(Node< valueType>* root, int h, std::string &line) {
-    if (root)
-    {
-        PrintTreeRec(root->right, h + 4, line);
-        for (int i = 1; i <= h; i++)line += " ";
-        line += root->key;
-        line += " [";
-        root->value->print(line);
-        line += "]\n";
-        PrintTreeRec(root->left, h + 4, line);
+template< typename valueType> void AvlTree1< valueType>::searchTreeNode(Node< valueType>* pointer, std::string key, Node<valueType>*& res) {
+    if (pointer != NULL) {
+        if (pointer->head > key) {
+            if (pointer->leftChild != nullptr) {
+                searchTreeNode(pointer->leftChild, key, res);
+            }
+        }
+        else if (pointer->head < key) {
+            if (pointer->rightChild != nullptr) {
+                searchTreeNode(pointer->rightChild, key, res);
+            }
+        }
+        else {
+            res = pointer;
+        }
     }
 }
 
-template<typename valueType>  void AvlTree1< valueType>::MemoryClear(Node< valueType>*& root) {
-    if (root) {
-        if (root->left)MemoryClear(root->left);
-        if (root->right)MemoryClear(root->right);
-        delete root;
-        root = nullptr;
-    }
-}
+template< typename valueType> void AvlTree1< valueType>::push(std::string key, valueType value) { addNode(tree1, key, value); }
 
-template<typename valueType>  void AvlTree1< valueType>::push(std::string key, valueType value) { AddRec(tree1, key, value); }
+template<typename valueType> void AvlTree1< valueType>::delete_key(std::string key, valueType value) { delNode(tree1, key, value); }
 
-template<typename valueType>  void AvlTree1< valueType>::delete_key(std::string key, valueType value) { DeleteRec(tree1, key, value); }
-
-template<typename valueType>  Node< valueType>* AvlTree1< valueType>::search_key(std::string key) {
+template< typename valueType> Node<valueType>* AvlTree1< valueType>::search_key(std::string key) {
     Node< valueType>* res = nullptr;
-    SearchElementRec(tree1, key, res);
+    searchTreeNode(tree1, key, res);
     return res;
 }
 
-template<typename valueType>  std::string AvlTree1< valueType>::print() { std::string line; PrintTreeRec(tree1, 1, line); return line; }
+template< typename valueType> std::string AvlTree1< valueType>::print() { std::string line; printTree(tree1, 1, line); return line; }
 
-template<typename valueType> AvlTree1< valueType>::~AvlTree1() { MemoryClear(tree1); }
+template< typename valueType> AvlTree1< valueType>::~AvlTree1() { deleteTree(tree1); }
+//========================================ДЕРЕВО 2========================================//
 
 template<typename valueType> AvlTree2< valueType>::AvlTree2() {
     this->tree1 = nullptr;
@@ -1124,23 +1136,26 @@ template< typename valueType> void AvlTree2< valueType>::delNode(treeNode< value
         }
     }
     else {
-        temp = pointer;
-        if (temp->rightChild == nullptr) {
-            pointer = temp->leftChild;
-            heightChanged = true;
-            delete temp;
-            temp = nullptr;
-        }
-        else if (temp->leftChild == nullptr) {
-
-            pointer = temp->rightChild;
-            heightChanged = true;
-            delete temp;
-            temp = nullptr;
-        }
+        if (pointer->value->getCount() > 1)pointer->value->delete_element(value);
         else {
-            _delWhenTwoChild(temp->rightChild, temp);
-            if (heightChanged) _del_balanceRight(pointer);
+            temp = pointer;
+            if (temp->rightChild == nullptr) {
+                pointer = temp->leftChild;
+                heightChanged = true;
+                delete temp;
+                temp = nullptr;
+            }
+            else if (temp->leftChild == nullptr) {
+
+                pointer = temp->rightChild;
+                heightChanged = true;
+                delete temp;
+                temp = nullptr;
+            }
+            else {
+                _delWhenTwoChild(temp->rightChild, temp);
+                if (heightChanged) _del_balanceRight(pointer);
+            }
         }
     }
 }
@@ -1177,297 +1192,305 @@ template< typename valueType> std::string AvlTree2< valueType>::print() { std::s
 
 template< typename valueType> AvlTree2< valueType>::~AvlTree2() { deleteTree(tree1); }
 
-template< typename valueType> AvlTree3< valueType>::AvlTree3() {
+//========================================ДЕРЕВО 3========================================//
+
+template<typename valueType> AvlTree3< valueType>::AvlTree3() {
     this->tree1 = nullptr;
-    this->h = false;
+    this->heightChanged = false;
 }
 
-template< typename valueType> void AvlTree3< valueType>::BalanceL(elem< valueType>*& root) {
-    elem< valueType>* p1;
-    elem< valueType>* p2;
-    char bal1, bal2;
-    switch (root->balance)
+template< typename valueType> void AvlTree3< valueType>::printTree(elem< valueType>* root, int h, std::string& line) {
+    if (root)
     {
-    case -1:
-        root->balance = 0;
-        break;
-    case 0:
-        root->balance = 1;
-        h = false;
-        break;
-    case 1:
-        p1 = root->right; bal1 = p1->balance;
-        if (bal1 >= 0)
-        {
-            root->right = p1->left;
-            p1->left = root;
-            if (bal1 == 0) {
-                root->balance = 1;
-                p1->balance = -1;
-                h = false;
-            }
-            else
-            {
-                root->balance = 0;
-                p1->balance = 0;
-            }
-            root = p1;
-        }
-        else
-        {
-            p2 = p1->left; bal2 = p2->balance;
-            p1->left = p2->right; p2->right = p1;
-            root->right = p2->left; p2->left = root;
-            if (bal2 == 1) root->balance = -1;
-            else root->balance = 0;
-            if (bal2 == -1) p1->balance = 1;
-            else p1->balance = 0;
-            root = p2;
-            p2->balance = 0;
-        }
-
+        printTree(root->rightChild, h + 4, line);
+        for (int i = 1; i <= h; i++)line += " ";
+        line += root->head;
+        line += "[";
+        root->value->print_list(line);
+        line += "]\n";
+        printTree(root->leftChild, h + 4, line);
     }
 }
 
-template< typename valueType> void AvlTree3< valueType>::BalanceR(elem< valueType>*& root) {
-    elem< valueType>* p1;
-    elem< valueType>* p2;
-    char bal1, bal2;
-    switch (root->balance)
-    {
-    case 1:
-        root->balance = 0;
-        break;
-    case 0:
-        root->balance = 1;
-        h = false;
-        break;
-    case -1:
-        p1 = root->left; bal1 = p1->balance;
-        if (bal1 <= 0)
-        {
-            root->left = p1->right;
-            p1->right = root;
-            if (bal1 == 0) {
-                root->balance = -1;
-                p1->balance = 1;
-                h = false;
+template<typename valueType> void AvlTree3< valueType>::addNode(elem< valueType>*& pointer, std::string key, valueType value) {
+    elem< valueType>* pointer1, * pointer2;
+    if (pointer == nullptr) {
+        heightChanged = true;
+        pointer = new elem< valueType>(key, value);
+
+    }
+    else if (pointer->head > key) {
+        addNode(pointer->leftChild, key, value);
+        if (heightChanged) { // выросла левая часть 
+            if (pointer->balanceFactor == 1) {
+                pointer->balanceFactor = 0;
+                heightChanged = false;
             }
-            else
-            {
-                root->balance = 0;
-                p1->balance = 0;
+            else if (pointer->balanceFactor == 0) {
+                pointer->balanceFactor = -1;
             }
-            root = p1;
+            else {
+                pointer2 = new elem< valueType>(key, value);
+                pointer1 = new elem< valueType>(key, value);
+                pointer1 = pointer->leftChild;
+                if (pointer1->balanceFactor == -1) { //одиночная LL-ротация
+                    pointer->leftChild = pointer1->rightChild;
+                    pointer1->rightChild = pointer;
+                    pointer->balanceFactor = 0;
+                    pointer = pointer1;
+                }
+                else { //двойная LR ротация
+                    pointer2 = pointer1->rightChild;
+                    pointer1->rightChild = pointer2->leftChild;
+                    pointer2->leftChild = pointer1;
+                    pointer->leftChild = pointer2->rightChild;
+                    pointer2->rightChild = pointer;
+                    if (pointer2->balanceFactor == -1) pointer->balanceFactor = 1; else pointer->balanceFactor = 0;
+                    if (pointer2->balanceFactor == 1) pointer1->balanceFactor = -1; else pointer1->balanceFactor = 0;
+                    pointer = pointer2;
+                }
+                pointer->balanceFactor = 0;
+                heightChanged = false;
+            }
         }
-        else
-        {
-            p2 = p1->right; bal2 = p2->balance;
-            p1->right = p2->left; p2->left = p1;
-            root->left = p2->right; p2->right = root;
-            if (bal2 == -1) root->balance = 1;
-            else root->balance = 0;
-            if (bal2 == 1) p1->balance = -1;
-            else p1->balance = 0;
-            root = p2;
-            p2->balance = 0;
+    }
+    else if (pointer->head < key) {
+        addNode(pointer->rightChild, key, value);
+        if (heightChanged) { //выросла правая часть 
+            if (pointer->balanceFactor == -1) {
+                pointer->balanceFactor = 0;
+                heightChanged = false;
+            }
+            else if (pointer->balanceFactor == 0) {
+                pointer->balanceFactor = 1;
+            }
+            else {
+                pointer2 = new elem< valueType>(key, value);
+                pointer1 = new elem< valueType>(key, value);
+                pointer1 = pointer->rightChild;
+                if (pointer1->balanceFactor == 1) { // одиночаня RR ротация 
+                    pointer->rightChild = pointer1->leftChild;
+                    pointer1->leftChild = pointer;
+                    pointer->balanceFactor = 0;
+                    pointer = pointer1;
+                }
+                else { // двойная RL ротация 
+                    pointer2 = pointer1->leftChild;
+                    pointer1->leftChild = pointer2->rightChild;
+                    pointer2->rightChild = pointer1;
+                    pointer->rightChild = pointer2->leftChild;
+                    pointer2->leftChild = pointer;
+                    if (pointer2->balanceFactor == 1) pointer->balanceFactor = -1; else pointer->balanceFactor = 0;
+                    if (pointer2->balanceFactor == -1) pointer1->balanceFactor = 1; else pointer1->balanceFactor = 0;
+                    pointer = pointer2;
+                }
+                pointer->balanceFactor = 0;
+                heightChanged = false;
+            }
         }
 
+    }
+    else {
+        pointer->value->push_back(value);
+        heightChanged = false;
     }
 }
 
-template< typename valueType> void AvlTree3< valueType>::AddRec(elem< valueType>*& root, std::string key, valueType value) {
-    elem< valueType>* p1;
-    elem< valueType>* p2;
-    if (!root)
-    {
-        root = new elem< valueType>(key,value );
-        h = true;
+template< typename valueType> void AvlTree3< valueType>::_deleteTree(elem< valueType>*& pointer) {
+    if (pointer) {
+        if (pointer->leftChild != nullptr) {
+            _deleteTree(pointer->leftChild);
+        }
+        if (pointer->rightChild != nullptr) {
+            _deleteTree(pointer->rightChild);
+        }
+        delete pointer;
     }
-    else if (root->key > key)
-    {
-        AddRec(root->left, key, value);
-        if (h)
-        {
-            if (root->balance == 1) { root->balance = 0; h = false; }
-            else if (root->balance == 0) { root->balance = -1; }
-            else
-            {
-                p1 = root->left;
-                if (p1->balance == -1)
-                {
-                    root->left = p1->right;
-                    p1->right = root;
-                    root->balance = 0;
-                    root = p1;
-                }
-                else
-                {
-                    p2 = p1->right;
-                    p1->right = p2->left;
-                    p2->left = p1;
-                    root->left = p2->right;
-                    p2->right = root;
-                    if (p2->balance == -1)
-                    {
-                        root->balance = 1;
-                    }
-                    else
-                    {
-                        root->balance = 0;
-                    }
-                    if (p2->balance == 1)
-                    {
-                        p1->balance = -1;
-                    }
-                    else
-                    {
-                        p1->balance = 0;
-                    }
-                    root = p2;
-                }
-                root->balance = 0;
-                h = false;
+}
+
+template<typename valueType> elem< valueType>* AvlTree3< valueType>::deleteTree(elem< valueType>*& root) {
+    _deleteTree(root);
+    root = nullptr;
+    return root;
+}
+
+template< typename valueType> void AvlTree3< valueType>::_del_balanceLeft(elem< valueType>*& node) {
+    elem< valueType>* pointer1, * pointer2;
+    if (node->balanceFactor == -1) node->balanceFactor = 0;
+    else if (node->balanceFactor == 0) {
+        node->balanceFactor = 1;
+        heightChanged = false;
+    }
+    else {
+        pointer1 = new elem< valueType>(node->head, node->value);
+        pointer1 = node->rightChild;
+        if (pointer1->balanceFactor >= 0) {
+            node->rightChild = pointer1->leftChild;
+            pointer1->leftChild = node;
+            if (pointer1->balanceFactor == 0) {
+                node->balanceFactor = 1;
+                pointer1->balanceFactor = -1;
+                heightChanged = false;
             }
+            else {
+                node->balanceFactor = 0;
+                pointer1->balanceFactor = 0;
+            }
+            node = pointer1;
+        }
+        else {
+            pointer2 = new elem< valueType>(node->head, node->value);
+            pointer2 = pointer1->leftChild;
+            pointer1->leftChild = pointer2->rightChild;
+            pointer2->rightChild = pointer1;
+            node->rightChild = pointer2->leftChild;
+            pointer2->leftChild = node;
+            if (pointer2->balanceFactor == 1) {
+                node->balanceFactor = -1;
+            }
+            else {
+                node->balanceFactor = 0;
+            }
+            if (pointer2->balanceFactor == -1) {
+                pointer1->balanceFactor = 1;
+            }
+            else {
+                pointer1->balanceFactor = 0;
+            }
+            node = pointer2;
+            pointer2->balanceFactor = 0;
         }
     }
-    else if (root->key < key)
-    {
-        AddRec(root->right, key, value);
-        if (h)
-        {
-            if (root->balance == -1) { root->balance = 0; h = false; }
-            else if (root->balance == 0) { root->balance = 1; }
-            else
-            {
-                p1 = root->right;
-                if (p1->balance == 1)
-                {
-                    root->right = p1->left;
-                    p1->left = root;
-                    root->balance = 0;
-                    root = p1;
-                }
-                else
-                {
-                    p2 = p1->left;
-                    p1->left = p2->right;
-                    p2->right = p1;
-                    root->right = p2->left;
-                    p2->left = root;
+}
 
-                    if (p2->balance == 1)
-                    {
-                        root->balance = -1;
-                    }
-                    else
-                    {
-                        root->balance = 0;
-                    }
-                    if (p2->balance == -1)
-                    {
-                        p1->balance = 1;
-                    }
-                    else
-                    {
-                        p1->balance = 0;
-                    }
-                    root = p2;
-                }
-
-                root->balance = 0;
-                h = false;
-
+template< typename valueType> void AvlTree3< valueType>::_del_balanceRight(elem< valueType>*& node) {
+    elem< valueType>* pointer1, * pointer2;
+    if (node->balanceFactor == 1) node->balanceFactor = 0;
+    else if (node->balanceFactor == 0) {
+        node->balanceFactor = -1;
+        heightChanged = false;
+    }
+    else {
+        pointer1 = new elem< valueType>(node->head, node->value);
+        pointer1 = node->leftChild;
+        if (pointer1->balanceFactor <= 0) {
+            node->leftChild = pointer1->rightChild;
+            pointer1->rightChild = node;
+            if (pointer1->balanceFactor == 0) {
+                node->balanceFactor = -1;
+                pointer1->balanceFactor = 1;
+                heightChanged = false;
             }
+            else {
+                node->balanceFactor = 0;
+                pointer1->balanceFactor = 0;
+            }
+            node = pointer1;
+        }
+        else {
+            pointer2 = new elem< valueType>(node->head, node->value);
+            pointer2 = pointer1->rightChild;
+            pointer1->rightChild = pointer2->leftChild;
+            pointer2->leftChild = pointer1;
+            node->leftChild = pointer2->rightChild;
+            pointer2->rightChild = node;
+            if (pointer2->balanceFactor == -1) node->balanceFactor = 1; else node->balanceFactor = 0;
+            if (pointer2->balanceFactor == 1) pointer1->balanceFactor = -1; else pointer1->balanceFactor = 0;
+            node = pointer2;
+            pointer2->balanceFactor = 0;
+        }
+    }
+}
+
+template< typename valueType> void AvlTree3< valueType>::_delWhenTwoChild(elem< valueType>*& node, elem< valueType>*& delNode) {
+    if (node->rightChild != nullptr) {
+        _delWhenTwoChild(node->rightChild, delNode);
+        if (heightChanged) {
+            _del_balanceRight(node);
         }
     }
     else {
-        root->value->push_back(value);
+        delNode->head = node->head;
+        delNode->value = node->value;
+        delNode = node;
+        node = node->leftChild;
+        heightChanged = true;
+
     }
 }
 
-template<typename valueType> void AvlTree3< valueType>::Del(elem< valueType>*& r, elem< valueType>*& q) {
-    if (r->right)
-    {
-        Del(r->right, q);
-        if (h)BalanceR(r);
-    }
-    else
-    {
-        q->key = r->key;
-        q -> value = r->value;
-        q = r;
-        r = r->left;
-        h = true;
-    }
-}
+template< typename valueType> void AvlTree3< valueType>::delNode(elem< valueType>*& pointer, std::string key, valueType value) {
+    elem< valueType>* temp = nullptr;
+    if (pointer == nullptr);//нет в дереве
+    else if (pointer->head > key) {// > 
+        delNode(pointer->leftChild, key, value);
+        if (heightChanged) {
+            _del_balanceLeft(pointer);
+        }
 
-template< typename valueType> void AvlTree3< valueType>::DeleteRec(elem< valueType>*& root, std::string key, valueType value) {
-    elem< valueType>* q;
-    if (!root) {}
-    else if (root->key > key)
-    {
-        DeleteRec(root->left, key, value);
-        if (h) BalanceL(root);
     }
-    else if (root->key < key)
-    {
-        DeleteRec(root->right, key, value);
-        if (h) BalanceR(root);
+    else if (pointer->head < key) {// <
+        delNode(pointer->rightChild, key, value);
+        if (heightChanged) {
+            _del_balanceRight(pointer);
+        }
     }
-    else
-    {
-        q = root;
-        if (!q->right) { root = q->left; h = true; }
-        else if (!q->left) { root = q->right; h = true; }
-        else
-        {
-            Del(q->left, q);
-            if (h) BalanceL(root);
+    else {
+        if (pointer->value->getCount() > 1)pointer->value->delete_element(value);
+        else {
+            temp = pointer;
+            if (temp->rightChild == nullptr) {
+                pointer = temp->leftChild;
+                heightChanged = true;
+                delete temp;
+                temp = nullptr;
+            }
+            else if (temp->leftChild == nullptr) {
+
+                pointer = temp->rightChild;
+                heightChanged = true;
+                delete temp;
+                temp = nullptr;
+            }
+            else {
+                _delWhenTwoChild(temp->leftChild, temp);
+                if (heightChanged) _del_balanceLeft(pointer);
+            }
         }
     }
 }
 
-template<typename valueType> void AvlTree3< valueType>::SearchElementRec(elem< valueType>* root, std::string key, elem< valueType>*& res) {
-    if (root->key == key)res = root;
-    if (root->left)SearchElementRec(root->left, key, res);
-    if (root->right)SearchElementRec(root->right, key, res);
-}
-
-template< typename valueType> void AvlTree3< valueType>::PrintTreeRec(elem< valueType>* root, int h, std::string &line) {
-    if (root)
-    {
-        PrintTreeRec(root->right, h + 4, line);
-        line += root->key;
-        line += " [";
-        root->value->print_list(line);
-        line += "]\n";
-        PrintTreeRec(root->left, h + 4, line);
+template< typename valueType> void AvlTree3< valueType>::searchTreeNode(elem< valueType>* pointer, std::string key, elem<valueType>*& res) {
+    if (pointer != NULL) {
+        if (pointer->head > key) {
+            if (pointer->leftChild != nullptr) {
+                searchTreeNode(pointer->leftChild, key, res);
+            }
+        }
+        else if (pointer->head < key) {
+            if (pointer->rightChild != nullptr) {
+                searchTreeNode(pointer->rightChild, key, res);
+            }
+        }
+        else {
+            res = pointer;
+        }
     }
 }
 
-template< typename valueType> void AvlTree3< valueType>::MemoryClear(elem< valueType>*& root) {
-    if (root) {
-        if (root->left)MemoryClear(root->left);
-        if (root->right)MemoryClear(root->right);
-        delete root;
-        root = nullptr;
-    }
-}
+template< typename valueType> void AvlTree3< valueType>::push(std::string key, valueType value) { addNode(tree1, key, value); }
 
-template<typename valueType > void AvlTree3< valueType>::push(std::string key, valueType value) { AddRec(tree1, key, value); }
+template<typename valueType> void AvlTree3< valueType>::delete_key(std::string key, valueType value) { delNode(tree1, key, value); }
 
-template<typename valueType> void AvlTree3< valueType>::delete_key(std::string key, valueType value) { DeleteRec(tree1, key, value); }
-
-template<typename valueType> elem< valueType>* AvlTree3< valueType>::search_key(std::string key) {
+template< typename valueType> elem< valueType>* AvlTree3< valueType>::search_key(std::string key) {
     elem< valueType>* res = nullptr;
-    SearchElementRec(tree1, key, res);
+    searchTreeNode(tree1, key, res);
     return res;
 }
 
-template< typename valueType> std::string AvlTree3< valueType>::print() { std::string line; PrintTreeRec(tree1, 1, line); return line; }
+template< typename valueType> std::string AvlTree3< valueType>::print() { std::string line; printTree(tree1, 1, line); return line; }
 
-template<typename valueType> AvlTree3< valueType>::~AvlTree3() { MemoryClear(tree1); }
+template< typename valueType> AvlTree3< valueType>::~AvlTree3() { deleteTree(tree1); }
 
 //========================================ШЕХ ТАБЛИЦЫ========================================//
 

@@ -82,11 +82,11 @@ void Logic::DeleteOrderData(int id) {
 		this->OrderDateTree->delete_key(last.getStartDate().toString(), this->ordersCount);
 		this->OrderHT->Delete(&last);
 		this->Orders.pop_back();
-		this->OrderCompanyTree->push(data.getCompany(), id);
-		this->OrderLoginTree->push(data.getLogin(), id);
-		this->OrderDateTree->push(data.getStartDate().toString(), id);
-		this->OrderNameTree->push(data.getName(), id);
-		this->OrderHT->Add(&data, id);
+		this->OrderCompanyTree->push(last.getCompany(), id);
+		this->OrderLoginTree->push(last.getLogin(), id);
+		this->OrderDateTree->push(last.getStartDate().toString(), id);
+		this->OrderNameTree->push(last.getName(), id);
+		this->OrderHT->Add(&last, id);
 	}
 	else this->Orders.pop_back();
 }
@@ -122,11 +122,7 @@ void Logic::DeleteSubscribeData(int id) {
 }
 
 void Logic::DeleteClientData(int id) {	
-	/*Client* data = this->Clients->get_element(id);
-	this->ClientCountryTree->delete_key(data->getCountry(), id);
-	this->ClientTownTree->delete_key(data->getTown(), id);
-	this->ClientDateTree->delete_key(data->getDate().toString(), id);
-	this->Clients->delete_element(*data);*/
+
 	Client data = this->Clients.at(id);
 	this->ClientCountryTree->delete_key(data.getCountry(), id);
 	this->ClientTownTree->delete_key(data.getTown(), id);
@@ -140,11 +136,11 @@ void Logic::DeleteClientData(int id) {
 		this->ClientTownTree->delete_key(last.getTown(), clientsCount);
 		this->ClientDateTree->delete_key(last.getDate().toString(), clientsCount);
 		this->Clients.pop_back();
-		this->ClientHT->Delete(data.getLogin());
+		this->ClientHT->Delete(last.getLogin());
 		this->ClientCountryTree->push(last.getCountry(), id);
 		this->ClientTownTree->push(last.getTown(), id);
 		this->ClientDateTree->push(last.getDate().toString(), id);
-		this->ClientHT->Add(last.getLogin(), this->clientsCount);
+		this->ClientHT->Add(last.getLogin(), id);
 	}
 	else this->Clients.pop_back();
 }
@@ -299,7 +295,6 @@ void Logic::Clear(int type) {
 		Clients.clear();
 		delete ClientTownTree;
 		delete ClientCountryTree;
-		delete ClientDateTree;
 		delete ClientDateTree;
 		clientsCount = 0;
 		this->ClientCountryTree = new AvlTree3< int>;
