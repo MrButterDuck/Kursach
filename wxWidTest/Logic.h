@@ -1,27 +1,30 @@
 #pragma once
 #include "Structs.h"
 #include "DataTypes.h"
+#include <fstream>
+#include <sstream>
+#include <vector>
 class Logic
 {
 private:
-	CycleList<Order> *Orders;
-	AvlTree1<std::string, Order*>* OrderLoginTree;
-	AvlTree1<std::string, Order*>* OrderNameTree;
-	AvlTree1<std::string, Order*>* OrderCompanyTree;
-	AvlTree1<Date, Order*>* OrderDateTree;
+	std::vector<Order> Orders;
+	AvlTree1< int>* OrderLoginTree;
+	AvlTree1< int>* OrderNameTree;
+	AvlTree1<int>* OrderCompanyTree;
+	AvlTree1< int>* OrderDateTree;
 	HashTable1 *OrderHT;
 
-	OnePointList<Subscribe> *Subscribes;
-	AvlTree2<std::string, Subscribe*> *SubscribeNameTree;
-	AvlTree2<std::string, Subscribe*> *SubscribeCompanyTree;
-	AvlTree2<unsigned int, Subscribe*> *SubscribeCostTree;
-	AvlTree2<unsigned int, Subscribe*> *SubscribeMinDurTree;
+	std::vector <Subscribe> Subscribes;
+	AvlTree2<int> *SubscribeNameTree;
+	AvlTree2< int> *SubscribeCompanyTree;
+	AvlTree2<int> *SubscribeCostTree;
+	AvlTree2<int> *SubscribeMinDurTree;
 	HashTable3* SubscribeHT;
 	// À»≈Õ“€
-	TwoPointList<Client> *Clients;
-	AvlTree3<std::string, Client*>* ClientCountryTree;
-	AvlTree3<std::string, Client*>* ClientTownTree;
-	AvlTree3<Date, Client*>* ClientDateTree;
+	std::vector <Client> Clients;
+	AvlTree3<int>* ClientCountryTree;
+	AvlTree3< int>* ClientTownTree;
+	AvlTree3< int>* ClientDateTree;
 	HashTable2 *ClientHT;
 
 	unsigned int ordersCount, subscribesCount, clientsCount;
@@ -30,18 +33,30 @@ public:
 	void AddData(Order& data);
 	void AddData(Subscribe& data);
 	void AddData(Client& data);
-	void DeleteData(Order& data);
-	void DeleteData(Subscribe& data);
-	void DeleteData(Client& data);
+	void DeleteOrderData(int id);
+	void DeleteSubscribeData(int id);
+	void DeleteClientData(int id);
+	std::string PrintOrderStruct(int type);
+	std::string PrintSubscribeStruct(int type);
+	std::string PrintClientStruct(int type);
 	unsigned int getClientCount();
 	unsigned int getSubscribesCount();
 	unsigned int getOrderCount();
 	Order* getOrder(int i);
 	Subscribe* getSubscribe(int i);
 	Client* getClient(int i);
-	CycleList<Order>* getOrderList();
-	OnePointList<Subscribe>* getSubscribesList();
-	TwoPointList<Client>* getClientList();
+	std::vector<Order>* getOrderList();
+	std::vector<Subscribe>* getSubscribesList();
+	std::vector<Client>* getClientList();
+	void readFromFile(std::string path);
+	void writeToFile(std::string path);
+	void Clear(int type);
+	CycleList<int>* searchData(std::string* login, std::string* Name, std::string* Company, Date startDate);
+	OnePointList<int>* searchData(std::string* Name, std::string* Company, std::string* cost, std::string* dur);
+	TwoPointList<int>* searchData(Date date, std::string* Country, std::string* Town);
+	int searchHT(Order data);
+	int searchHT(Subscribe data);
+	int searchHT(Client data);
 	~Logic();
 };
 

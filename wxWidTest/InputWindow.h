@@ -17,5 +17,9 @@ private:
 	wxMyGrid* grid;
 	wxTextCtrl* inputFields[4];
 	wxCalendarCtrl* calendar;
+	wxChoice* choice;
 	void checkData(wxCommandEvent& evt);
+	void searchData(wxCommandEvent& evt);
+	void updateSearch(wxCommandEvent& evt);
+	wxDECLARE_EVENT_TABLE();
 };

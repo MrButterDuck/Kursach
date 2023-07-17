@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Cursach.h" />
     <ClInclude Include="DataTypes.h" />
+    <ClInclude Include="DebugWindow.h" />
     <ClInclude Include="InputWindow.h" />
     <ClInclude Include="Logic.h" />
     <ClInclude Include="MainFrame.h" />
@@ -30,6 +31,7 @@
   <ItemGroup>
     <ClCompile Include="Cursach.cpp" />
     <ClCompile Include="DataTypes.cpp" />
+    <ClCompile Include="DebugWindow.cpp" />
     <ClCompile Include="InputWindow.cpp" />
     <ClCompile Include="Logic.cpp" />
     <ClCompile Include="MainFrame.cpp" />
