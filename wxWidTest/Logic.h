@@ -27,15 +27,15 @@ private:
 	AvlTree3< int>* ClientDateTree;
 	HashTable2 *ClientHT;
 
-	unsigned int ordersCount, subscribesCount, clientsCount;
+	unsigned int ordersCount, subscribesCount, clientsCount, ht_szie, ht_k;
 public:
-	Logic();
-	void AddData(Order& data);
-	void AddData(Subscribe& data);
-	void AddData(Client& data);
+	Logic(int size, int k);
+	bool AddData(Order& data);
+	bool AddData(Subscribe& data);
+	bool AddData(Client& data);
 	void DeleteOrderData(int id);
-	void DeleteSubscribeData(int id);
-	void DeleteClientData(int id);
+	bool DeleteSubscribeData(int id);
+	bool DeleteClientData(int id);
 	std::string PrintOrderStruct(int type);
 	std::string PrintSubscribeStruct(int type);
 	std::string PrintClientStruct(int type);

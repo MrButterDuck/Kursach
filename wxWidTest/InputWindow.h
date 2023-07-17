@@ -18,6 +18,7 @@ private:
 	wxTextCtrl* inputFields[4];
 	wxCalendarCtrl* calendar;
 	wxChoice* choice;
+	wxChoice* orderInput[2];
 	void checkData(wxCommandEvent& evt);
 	void searchData(wxCommandEvent& evt);
 	void updateSearch(wxCommandEvent& evt);

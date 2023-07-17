@@ -16,8 +16,8 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
 wxEND_EVENT_TABLE()
 
 
-MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) {
-	this->logic = new Logic;
+MainFrame::MainFrame(const wxString& title, int size, int k) : wxFrame(nullptr, wxID_ANY, title) {
+	this->logic = new Logic(size, k);
 	this->currentDict = 2;
 	//Main Panel
 	//wxPanel* panel = new wxPanel(this);
@@ -47,6 +47,7 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) 
 	this->grid->CreateGrid(0, 4);
 	this->grid->EnableEditing(false);
 	this->grid->Refresh();
+	//this->grid->SetFont(wxFont())
 	//RadioBox
 	wxArrayString choices;
 	choices.Add("Клиенты");
@@ -96,7 +97,9 @@ void MainFrame::ClearData(wxCommandEvent& evt) {
 }
 
 void MainFrame::DebugWin(wxCommandEvent& evt) {
-	wxLogStatus("Opened Degub Win");
+	//char d = 196;
+	//int i = d;
+	//wxLogStatus(wxString::Format(wxT("%i"),i));
 	DebugFrame* debugFrame = new DebugFrame("Debug", this->logic, this->currentDict);
 	debugFrame->SetMinSize(wxSize(1000, 1000));
 	debugFrame->SetMaxSize(wxSize(1000, 1000));
@@ -170,12 +173,12 @@ void MainFrame::DeleteData(wxCommandEvent& evt) {
 	if (arrInt.IsEmpty()) (new wxMessageDialog(nullptr, "Ни одна из строк таблицы не выбрана", "Одна ошибка и ты ошибся", wxOK))->ShowModal();
 	else {
 		if (this->currentDict == 0) {
-			this->logic->DeleteClientData(arrInt[0]);
-			this->ChooseDictionary();
+			if(this->logic->DeleteClientData(arrInt[0]))this->ChooseDictionary();
+			else  (new wxMessageDialog(nullptr, "Запись связана с записью в другом списке", "Ты берега не попутал?", wxOK))->ShowModal();
 		}
 		else if (this->currentDict == 1) {
-			this->logic->DeleteSubscribeData(arrInt[0]);
-			this->ChooseDictionary();
+			if(this->logic->DeleteSubscribeData(arrInt[0]))this->ChooseDictionary();
+			else  (new wxMessageDialog(nullptr, "Запись связана с записью в другом списке", "Ты берега не попутал?", wxOK))->ShowModal();
 		}
 		else if (this->currentDict == 2) {
 			this->logic->DeleteOrderData(arrInt[0]);

@@ -36,30 +36,21 @@ InputFrame::InputFrame(const wxString& title, char type, Logic* &logic, wxMyGrid
 		}
 
 	}
-	else if (type == 2 || type == 5) {
-		std::string lables[4]{ "Логин", "Название услуги", "Дистрибьютор", "Дата начала действия" };
-		for (int i = 0; i < 4; i++)
-		{
-			new wxStaticText(panel, wxID_ANY, lables[i], wxPoint(10, 20 + 30 * i));
-			if (i != 3)inputFields[i] = new wxTextCtrl(panel, 100 + i, wxEmptyString, wxPoint(150, 20 + 30 * i), wxSize(230, 20));
-			else calendar = new wxCalendarCtrl(panel, 100 + i, wxDefaultDateTime, wxPoint(150, 20 + 30 * i));
-		}
-		if (type == 2){
-			btn = new wxButton(panel, 120, "Добавить", wxPoint(160, 260), wxSize(80, 20));
-			btn->Bind(wxEVT_BUTTON, &InputFrame::checkData, this);
-		}
-		else {
-			wxArrayString choices;
-			choices.Add("по логину");
-			choices.Add("по названию");
-			choices.Add("по компании");
-			choices.Add("по дате");
-			choices.Add("по ключу");
-			this->choice = new wxChoice(panel, 220, wxPoint(30, 260), wxSize(80, 20), choices);
-			this->choice->Select(0);
-			btn = new wxButton(panel, 120, "Поиск", wxPoint(290, 260), wxSize(80, 20));
-			btn->Bind(wxEVT_BUTTON, &InputFrame::searchData, this);
-		}
+	else if (type == 2) {
+		new wxStaticText(panel, wxID_ANY, "Логин", wxPoint(10, 20));
+		new wxStaticText(panel, wxID_ANY, "Название услуги и\nДистрибьютор", wxPoint(10, 50));
+		new wxStaticText(panel, wxID_ANY, "Дата начала действия", wxPoint(10, 110));
+		wxArrayString logins;
+		std::vector<Client>* loginList = this->logic->getClientList();
+		for (auto cl : *loginList)logins.Add(cl.getLogin());
+		wxArrayString subs;
+		std::vector<Subscribe>* subList = this->logic->getSubscribesList();
+		for (auto sb : *subList)subs.Add(sb.getName()+" "+ sb.getCompany());
+		orderInput[0] = new wxChoice(panel, 543, wxPoint(150, 20), wxSize(230, 20), logins);
+		orderInput[1] = new wxChoice(panel, 543, wxPoint(150, 50), wxSize(230, 20), subs);
+		calendar = new wxCalendarCtrl(panel, 104, wxDefaultDateTime, wxPoint(150,110));
+		btn = new wxButton(panel, 120, "Добавить", wxPoint(160, 260), wxSize(80, 20));
+		btn->Bind(wxEVT_BUTTON, &InputFrame::checkData, this);
 	}
 	else if (type == 4 || type == 1) {
 		std::string lables[4]{ "Название услуги", "Дистрибьютор","Стоимость в месяц", "Минимальный срок\nдействия" }; 
@@ -86,6 +77,25 @@ InputFrame::InputFrame(const wxString& title, char type, Logic* &logic, wxMyGrid
 
 		}
 	}
+	else if (type == 5) {
+		std::string lables[4]{ "Логин", "Название услуги","Дистрибьютор", "Дата начала действия" };
+		for (int i = 0; i < 4; i++)
+		{
+			new wxStaticText(panel, wxID_ANY, lables[i], wxPoint(10, 20 + 30 * i));
+			if (i != 3)inputFields[i] = new wxTextCtrl(panel, 100 + i, wxEmptyString, wxPoint(150, 20 + 30 * i), wxSize(230, 20));
+			else calendar = new wxCalendarCtrl(panel, 100 + i, wxDefaultDateTime, wxPoint(150, 20 + 30 * i));
+		}
+		wxArrayString choices;
+		choices.Add("по логину");
+		choices.Add("по названию");
+		choices.Add("по компании");
+		choices.Add("по дате");
+		choices.Add("по ключу");
+		this->choice = new wxChoice(panel, 220, wxPoint(30, 260), wxSize(80, 20), choices);
+		this->choice->Select(0);
+		btn = new wxButton(panel, 120, "Поиск", wxPoint(290, 260), wxSize(80, 20));
+		btn->Bind(wxEVT_BUTTON, &InputFrame::searchData, this);
+	}
 }
 
 void InputFrame::checkData(wxCommandEvent& evt) {
@@ -97,23 +107,27 @@ void InputFrame::checkData(wxCommandEvent& evt) {
 			int day = calendar->GetDate().GetDay();
 			int month = calendar->GetDate().GetMonth();
 			int year = calendar->GetDate().GetYear();
-			Client buf = Client(std::string(inputFields[0]->GetValue().mb_str()), Date(day, month, year), std::string(inputFields[1]->GetValue().mb_str()), std::string(inputFields[2]->GetValue().mb_str()));
-			logic->AddData(buf);
+			Client buf = Client(std::string(inputFields[0]->GetValue().mb_str()), Date(day, month, year), std::string(inputFields[2]->GetValue().mb_str()), std::string(inputFields[1]->GetValue().mb_str()));
+			if(!logic->AddData(buf))(new wxMessageDialog(nullptr, "Запись не является уникальной", "Для мамы ты всегда уникален", wxOK))->ShowModal();
 			this->grid->update(logic->getClientList());
 			this->Close();
 		}
 
 	}
 	else if (type == 2 ) {
-		if (inputFields[0]->IsEmpty())wxMessageBox("Не все поля заполнены");
-		else if (inputFields[1]->IsEmpty())wxMessageBox("Не все поля заполнены");
-		else if (inputFields[2]->IsEmpty())wxMessageBox("Не все поля заполнены");
+		if (orderInput[0]->IsEmpty())wxMessageBox("Не все поля заполнены");
+		else if (orderInput[1]->IsEmpty())wxMessageBox("Не все поля заполнены");
 		else{
+			std::vector<Client>* loginList = this->logic->getClientList();
+			std::vector<Subscribe>* subList = this->logic->getSubscribesList();
+			std::string login = loginList->at(orderInput[0]->GetSelection()).getLogin();
+			std::string name = subList->at(orderInput[1]->GetSelection()).getName();
+			std::string company = subList->at(orderInput[1]->GetSelection()).getCompany();
 			int day = calendar->GetDate().GetDay();
 			int month = calendar->GetDate().GetMonth();
 			int year = calendar->GetDate().GetYear();
-			Order buf = Order(std::string(inputFields[0]->GetValue().mb_str()), std::string(inputFields[1]->GetValue().mb_str()), std::string(inputFields[2]->GetValue().mb_str()), Date(day, month, year));
-			logic->AddData(buf);
+			Order buf = Order(login, name, company, Date(day, month, year));
+			if(!logic->AddData(buf))(new wxMessageDialog(nullptr, "Запись не является уникальной", "Для мамы ты всегда уникален", wxOK))->ShowModal();
 			this->grid->update(logic->getOrderList());
 			this->Close();
 		}
@@ -130,8 +144,8 @@ void InputFrame::checkData(wxCommandEvent& evt) {
 			short int j = wxAtoi(inputFields[2]->GetValue());
 			if (j < 0 || i < 0)wxMessageBox("Значения не могут быть отрицательными");
 			else {
-				Subscribe buf = Subscribe(std::string(inputFields[0]->GetValue().mb_str()), std::string(inputFields[1]->GetValue().mb_str()), wxAtoi(inputFields[2]->GetValue()), wxAtoi(inputFields[2]->GetValue()));
-				logic->AddData(buf);
+				Subscribe buf = Subscribe(std::string(inputFields[0]->GetValue().mb_str()), std::string(inputFields[1]->GetValue().mb_str()), wxAtoi(inputFields[2]->GetValue()), wxAtoi(inputFields[3]->GetValue()));
+				if(!logic->AddData(buf))(new wxMessageDialog(nullptr, "Запись не является уникальной", "Для мамы ты всегда уникален", wxOK))->ShowModal();
 				this->grid->update(logic->getSubscribesList());
 				this->Close();
 			}

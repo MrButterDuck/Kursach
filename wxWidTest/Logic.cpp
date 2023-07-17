@@ -1,6 +1,8 @@
 #include "Logic.h"
 
-Logic::Logic() {
+Logic::Logic(int size, int k) {
+	this->ht_szie = size;
+	this->ht_k = k;
 	this->OrderLoginTree = new AvlTree1<int>;
 	this->OrderNameTree = new AvlTree1<int>;
 	this->OrderCompanyTree = new AvlTree1< int>;
@@ -12,13 +14,13 @@ Logic::Logic() {
 	this->SubscribeCostTree = new AvlTree2< int>;
 	this->SubscribeMinDurTree = new AvlTree2< int>;
 	this->SubscribeHT = new HashTable3(100);
-	this->SubscribeHT->setK(3);
+	this->SubscribeHT->setK(ht_k);
 
 
 	this->ClientCountryTree = new AvlTree3< int>;
 	this->ClientTownTree = new AvlTree3< int>;
 	this->ClientDateTree = new AvlTree3< int>;
-	this->ClientHT = new HashTable2(10);
+	this->ClientHT = new HashTable2(ht_szie);
 
 	this->ordersCount = 0;
 	this->clientsCount = 0;
@@ -29,7 +31,7 @@ Logic::~Logic() {
 
 }
 
-void Logic::AddData(Order& data) {
+bool Logic::AddData(Order& data) {
 	if (this->OrderHT->Add(&data, this->ordersCount)) {
 		OrderCompanyTree->push(data.getCompany(), ordersCount);
 		OrderLoginTree->push(data.getLogin(), ordersCount);
@@ -37,10 +39,12 @@ void Logic::AddData(Order& data) {
 		OrderNameTree->push(data.getName(), ordersCount);
 		Orders.push_back(data);
 		this->ordersCount++;
+		return true;
 	}
+	else return false;
 }
 
-void Logic::AddData(Subscribe& data) {
+bool Logic::AddData(Subscribe& data) {
 	std::string key = data.getName() + data.getCompany();
 	if (SubscribeHT->add(&key, this->subscribesCount)) {
 		SubscribeCompanyTree->push(data.getCompany(), subscribesCount);
@@ -49,18 +53,22 @@ void Logic::AddData(Subscribe& data) {
 		SubscribeMinDurTree->push(std::to_string(data.getMinimalDuration()), subscribesCount);
 		Subscribes.push_back(data);
 		this->subscribesCount++;
+		return true;
 	}
+	else return false;
 
 }
 
-void Logic::AddData(Client& data) {
+bool Logic::AddData(Client& data) {
 	if (this->ClientHT->Add(data.getLogin(), this->clientsCount)) {
 		ClientCountryTree->push(data.getCountry(), clientsCount);
 		ClientDateTree->push(data.getDate().toString(), clientsCount);
 		ClientTownTree->push(data.getTown(), clientsCount);
 		Clients.push_back(data);
 		this->clientsCount++;
+		return true;
 	}
+	else return false;
 
 }
 
@@ -91,9 +99,11 @@ void Logic::DeleteOrderData(int id) {
 	else this->Orders.pop_back();
 }
 
-void Logic::DeleteSubscribeData(int id) {
+bool Logic::DeleteSubscribeData(int id) {
 
 	Subscribe data = this->Subscribes.at(id);
+	std::string dataName = data.getName();
+	if (this->searchData(nullptr, &dataName, nullptr, Date()))return false;
 	this->SubscribeNameTree->delete_key(data.getName(), id);
 	this->SubscribeCompanyTree->delete_key(data.getCompany(), id);
 	this->SubscribeCostTree->delete_key(std::to_string(data.getCost()), id);
@@ -118,12 +128,14 @@ void Logic::DeleteSubscribeData(int id) {
 		this->SubscribeHT->add(&key, id);
 	}
 	else this->Subscribes.pop_back();
+	return true;
 
 }
 
-void Logic::DeleteClientData(int id) {	
-
+bool Logic::DeleteClientData(int id) {	
 	Client data = this->Clients.at(id);
+	std::string dataLogin = data.getLogin();
+	if (this->searchData(&dataLogin, nullptr, nullptr, Date()))return false;
 	this->ClientCountryTree->delete_key(data.getCountry(), id);
 	this->ClientTownTree->delete_key(data.getTown(), id);
 	this->ClientDateTree->delete_key(data.getDate().toString(), id);
@@ -143,6 +155,7 @@ void Logic::DeleteClientData(int id) {
 		this->ClientHT->Add(last.getLogin(), id);
 	}
 	else this->Clients.pop_back();
+	return true;
 }
 
 unsigned int Logic::getClientCount() {
@@ -209,6 +222,9 @@ std::string Logic::PrintClientStruct(int type) {
 }
 
 void Logic::readFromFile(std::string path) {
+	this->Clear(0);
+	this->Clear(1);
+	this->Clear(2);
 	std::fstream in;
 	in.open(path+"Clients.txt");
 	std::string buffer;
@@ -300,7 +316,7 @@ void Logic::Clear(int type) {
 		this->ClientCountryTree = new AvlTree3< int>;
 		this->ClientTownTree = new AvlTree3< int>;
 		this->ClientDateTree = new AvlTree3< int>;
-		this->ClientHT = new HashTable2(10);
+		this->ClientHT = new HashTable2(this->ht_szie);
 	}
 	else if (type == 1)
 	{
@@ -316,7 +332,7 @@ void Logic::Clear(int type) {
 		this->SubscribeCostTree = new AvlTree2< int>;
 		this->SubscribeMinDurTree = new AvlTree2< int>;
 		this->SubscribeHT = new HashTable3(100);
-		this->SubscribeHT->setK(3);
+		this->SubscribeHT->setK(this->ht_k);
 	}
 	else if (type == 2)
 	{

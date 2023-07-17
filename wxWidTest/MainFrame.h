@@ -34,7 +34,7 @@
 class MainFrame: public wxFrame
 {
 public:
-	MainFrame(const wxString& title);
+	MainFrame(const wxString& title, int size, int k);
 	void ChooseDictionary();
 private:
 	Logic* logic;

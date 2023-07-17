@@ -25,6 +25,7 @@
     <ClInclude Include="InputWindow.h" />
     <ClInclude Include="Logic.h" />
     <ClInclude Include="MainFrame.h" />
+    <ClInclude Include="startWindows.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="wxMyGrid.h" />
   </ItemGroup>
@@ -35,6 +36,7 @@
     <ClCompile Include="InputWindow.cpp" />
     <ClCompile Include="Logic.cpp" />
     <ClCompile Include="MainFrame.cpp" />
+    <ClCompile Include="startWindows.cpp" />
     <ClCompile Include="Structs.cpp" />
     <ClCompile Include="wxMyGrid.cpp" />
   </ItemGroup>

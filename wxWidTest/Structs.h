@@ -604,12 +604,12 @@ template<typename valueType> AvlTree1< valueType>::AvlTree1() {
 template< typename valueType> void AvlTree1< valueType>::printTree(Node< valueType>* root, int h, std::string& line) {
     if (root)
     {
-        printTree(root->rightChild, h + 4, line);
+        printTree(root->rightChild, h + 10, line);
         for (int i = 1; i <= h; i++)line += " ";
         line += root->head;
         line += "[";
         root->value->print(line);
-        line += "]\n";
+        line += "]\n\n";
         printTree(root->leftChild, h + 4, line);
     }
 }
@@ -903,12 +903,12 @@ template<typename valueType> AvlTree2< valueType>::AvlTree2() {
 template< typename valueType> void AvlTree2< valueType>::printTree(treeNode< valueType>* root, int h, std::string &line) {
     if (root)
     {
-        printTree(root->rightChild, h + 4, line);
+        printTree(root->rightChild, h + 10, line);
         for (int i = 1; i <= h; i++)line += " ";
         line += root->head;
         line += "[";
         root->value->print_list(line);
-        line += "]\n";
+        line += "]\n\n";
         printTree(root->leftChild, h + 4, line);
     }
 }
@@ -1202,12 +1202,12 @@ template<typename valueType> AvlTree3< valueType>::AvlTree3() {
 template< typename valueType> void AvlTree3< valueType>::printTree(elem< valueType>* root, int h, std::string& line) {
     if (root)
     {
-        printTree(root->rightChild, h + 4, line);
+        printTree(root->rightChild, h + 10, line);
         for (int i = 1; i <= h; i++)line += " ";
         line += root->head;
         line += "[";
         root->value->print_list(line);
-        line += "]\n";
+        line += "]\n\n";
         printTree(root->leftChild, h + 4, line);
     }
 }
@@ -1534,7 +1534,7 @@ public:
         std::string res = "";
         for (int i = 0; i < _size; i++)
         {
-            if (status[i] == 1)res += std::to_string(i) + ": "+ table[i].getLogin() + " " + table[i].getName() + " " + table[i].getCompany() + " " + table[i].getStartDate().toString() + " = " + std::to_string(value[i]) + "\n";
+            if (status[i] == 1)res +=  table[i].getLogin() + " " + table[i].getName() + " " + table[i].getCompany() + " " + table[i].getStartDate().toString() + " = " + std::to_string(value[i]) + "\n";
         }
         return res;
     }
@@ -1904,7 +1904,7 @@ public:
         std::string res = "";
         for (int i = 0; i < size; i++)
         {
-            if (table[i]._status == 1)res += std::to_string(i) + ": " + table[i]._data + " = " + std::to_string(table[i]._value) + "\n";
+            if (table[i]._status == 1)res +=  table[i]._data + " = " + std::to_string(table[i]._value) + "\n";
         }
         return res;
     }
@@ -1930,7 +1930,7 @@ public:
     {
         this->size = size;
         usersize = size;
-        data = new std::string [size];
+        data = new std::string[size];
         status = new int[size];
         value = new int[size];
         for (int i = 0; i < size; i++) { status[i] = 0; }
@@ -1983,7 +1983,7 @@ public:
         std::string res = "";
         for (int i = 0; i < size; i++)
         {
-            if (status[i] == 1)res += std::to_string(i) + ": " + data[i] + " = " + std::to_string(value[i]) + "\n";
+            if (status[i] == 1)res += data[i] + " = " + std::to_string(value[i]) + "\n";
         }
         return res;
     }
@@ -1993,111 +1993,116 @@ public:
         fullness = ((double)count / size);
     }
 
-    int add_coll_resol(std::string* object, int index, int& attempt, bool& isAdded, int id)
+    bool add(std::string* key, int id)
     {
-        int potential = -1;
-        while (attempt <= size && isAdded == false && potential == -1)
+        int hash = primary_hash(key);
+        if (status[hash] != 1)
         {
-            int step = secondary_hash(index, attempt, k);
-            if (status[step] == 0 || status[step] == 2)
+            int i = 1;
+            int col = secondary_hash(hash, i, k);
+            while (status[col] != 0 && !(data[col] == *key && status[col] == 1) && i <= size)col = secondary_hash(hash, ++i, k);
+            if (!(data[col] == *key && status[col] == 1))
             {
-                potential = step;
-            }
-            attempt++;
-        }
-        return potential;
-    }
-    bool add(std::string* object, int id) {
-        bool isAdded = false;
-        int index = primary_hash(object);
-        int attempt = 0;
-        if (status[index] == 0 || status[index] == 2)
-        {
-            data[index] = *object;
-            status[index] = 1;
-            value[index] = id;
-            count++;
-            isAdded = true;
-            // cout << "Вставлено с " << attempt << " попытки" << endl;
-            checkfullness();
-            return true;
-        }
-        else
-        {
-
-            int index1 = add_coll_resol(object, index, attempt, isAdded, id);
-            if (data[index] == *object)
-            {
-                //cout << "Такой элемент уже существует" << endl;
-                return false;
+                data[hash] = *key;
+                status[hash] = 1;
+                value[hash] = id;
+                count++;
+                checkfullness();
+                return true;
             }
             else
             {
-                if (index1 != -1) {
-                    data[index1] = *object;
-                    status[index1] = 1;
-                    value[index] = id;
-                    count++;
-                    //    cout << "Вставлено с " << attempt << " попытки" << endl;
-                    checkfullness();
-                    return true;
-                }
-                else
-                {
-                    resizetable(size + usersize);
-                    checkfullness();
-                    if (!isAdded)return add(object, id);
-                }
-
+                return false;
             }
         }
-        if (fullness >= 0.75 || !isAdded)
+        else if (!(data[hash] == *key && status[hash] == 1))
         {
-            resizetable(size + usersize);
-            checkfullness();
-            if (!isAdded)return add(object, id);
-        }
-    }
-
-    int remove_coll_resol(std::string* object, int index, int& attempt)
-    {
-        int potential = -1;
-        while (attempt <= size && potential == -1)
-        {
-            int step = secondary_hash(index, attempt, k);
-            if (data[step] == *object)
-            {
-                potential = step;
-            }
-            attempt++;
-        }
-        return potential;
-    }
-    void remove(std::string* object)
-    {
-        int index = primary_hash(object);
-        int attempt = 0;
-        if (status[index] == 1 && data[index] == *object)
-        {
-            count--;
-            status[index] = 2;
-            checkfullness();
-            return;
+            return colAdd(hash, key, id);
         }
         else
         {
-            int index1 = remove_coll_resol(object, index, attempt);
-            count--;
-            status[index1] = 2;
+            return false;
+        }
+        if (fullness > 0.75)resizetable(size + usersize);
+    }
+
+    bool colAdd(int hash, std::string* key, int id)
+    {
+        bool isAdded = false;
+        int i = 1;
+        int col = secondary_hash(hash, i, k);
+        while (status[col] != 0 && !(data[col] == *key) && i <= size)col = secondary_hash(hash, ++i, k);
+        if (status[col] == 0 || status[col] == 2)
+        {
+            data[col] = *key;
+            status[col] = true;
+            value[col] = id;
+            count++;
+            isAdded = true;
             checkfullness();
-            return;
+            return true;
+        }
+        else if (data[hash] == *key)
+        {
+            return false;
         }
 
-        if (!status[index]) return;
-
-        if (fullness <= 0.25)
+        if (!isAdded)
         {
-            resizetable(size - usersize);
+            resizetable(size + usersize);
+            return add(key, id);
+        }
+    }
+
+    void remove(std::string* key)
+    {
+        int hash = primary_hash(key);
+        if (status[hash] != 0)
+        {
+            if (data[hash] == *key && status[hash] == 1)
+            {
+                int i = 1;
+                int col = secondary_hash(hash, i, k);
+                int last = hash;
+                while (status[col] != 0 && i <= size)
+                {
+                    if (primary_hash(&data[col]) == hash && status[col] == 1)last = col;
+                    col = secondary_hash(hash, ++i, k);
+                }
+                data[hash] = data[last];
+                status[last] = 2;
+                count--;
+                checkfullness();
+            }
+            else
+            {
+                colDel(hash, key);
+            }
+            if ((usersize <= size - usersize) && (fullness < 0.25))
+            {
+                resizetable(size - usersize);
+            }
+        }
+    }
+
+    void colDel(int hash, std::string* key)
+    {
+        int del = -1;
+        int i = 1;
+        int col = secondary_hash(hash, i, k);
+        int last = hash;
+        while (status[col] != 0 && i <= size)
+        {
+            if (data[col] == *key && status[col] == 1)del = col;
+            if (primary_hash(&data[col]) == hash && status[col] == 1)last = col;
+            col = secondary_hash(hash, ++i, k);
+        }
+        if (del == -1) {}
+        else
+        {
+            data[del] = data[last];
+            status[last] = 2;
+            count--;
             checkfullness();
         }
     }
@@ -2114,10 +2119,17 @@ public:
         if (newsize < usersize)size = usersize;
         else size = newsize;
         count = 0;
-        memset(status, 0, size);
-        for (int i = 0; i < oldSize; i++) { if (oldStatus[i] == 1) { add(&oldTable[i], OldValue[i]); } };
+        for (int i = 0; i < size; i++)status[i] = 0;
+        //for(int i = 0; i < size; i++)std::cout<< oldStatus[i]<< std::endl;
+        //std::cout << "++++++++++" << std::endl;
+        for (int i = 0; i < oldSize; i++) {
+            if (oldStatus[i] == 1) {
+                add(&oldTable[i], OldValue[i]);
+            }
+        };
         delete[] oldStatus;
         delete[] oldTable;
+        delete[] OldValue;
     }
 
     int find(std::string* object)
@@ -2153,5 +2165,6 @@ public:
     ~HashTable3() {
         delete[] data;
         delete[] status;
+        delete[] value;
     }
 };

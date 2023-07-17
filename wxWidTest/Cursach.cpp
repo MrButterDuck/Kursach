@@ -1,11 +1,12 @@
 #include "Cursach.h"
 #include "MainFrame.h"
-#include "icons/waffle.xpm"
+#include "startWindows.h"
 #include <wx/wx.h>
 
 wxIMPLEMENT_APP(Cursach);
 
 bool Cursach::OnInit() {
+	(new startFrame("õî÷ó âàôëè"))->Show();
 	struct stat buffer;
 	std::string path = "./save/";
 	if (stat(path.c_str(), &buffer) != 0) {
@@ -18,11 +19,6 @@ bool Cursach::OnInit() {
 		file.open(path + "Orders.txt");
 		file.close();
 	}
-	MainFrame* mainFrame = new MainFrame("ÂÀÔËß");
-	mainFrame->Center();
-	mainFrame->Maximize();
-	mainFrame->SetIcon(wxIcon(waffle_icon));
-	mainFrame->Show();
-	mainFrame->ChooseDictionary();
+
 	return true;
 }

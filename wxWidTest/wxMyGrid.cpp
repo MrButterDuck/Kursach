@@ -26,8 +26,8 @@ void wxMyGrid::update(std::vector<Order>* lst) {
 		j++;
 	}
 	this->SetColLabelValue(0, "Логин");
-	this->SetColLabelValue(1, "Название\nподписки");
-	this->SetColLabelValue(2, "Компания");
+	this->SetColLabelValue(1, "Название\nуслуги");
+	this->SetColLabelValue(2, "Дистрибьютор");
 	this->SetColLabelValue(3, "Дата начала");
 }
 
@@ -43,9 +43,9 @@ void wxMyGrid::update(std::vector<Subscribe>* lst) {
 		this->SetCellValue(wxGridCellCoords(j, 3), std::to_string(val.getMinimalDuration()));
 		j++;
 	}
-	this->SetColLabelValue(0, "Название\nподписки");
-	this->SetColLabelValue(1, "Компания");
-	this->SetColLabelValue(2, "Стоимость");
+	this->SetColLabelValue(0, "Название\nуслуги");
+	this->SetColLabelValue(1, "Дистрибьютор");
+	this->SetColLabelValue(2, "Стоимость в месяц");
 	this->SetColLabelValue(3, "Минимальный\nсрок действия");
 }
 

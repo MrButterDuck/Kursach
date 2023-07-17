@@ -18,7 +18,7 @@ public:
 	int getMonth() { return this->month; }
 	unsigned short int getYear() { return this->year; }
 	std::string toString() {
-		return std::to_string(this->day) + "." + std::to_string(this->month) + "." + std::to_string(this->year);
+		return std::to_string(this->day) + "." + std::to_string(this->month+1) + "." + std::to_string(this->year);
 	}
 	bool operator==(const Date& p) {
 		return (this->day == p.day && this->month == p.month && this->year == p.year);
