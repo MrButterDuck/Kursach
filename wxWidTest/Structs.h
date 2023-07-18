@@ -143,7 +143,7 @@ struct treeNode {
     OnePointList<valueType> *value;
     std::string head;
     treeNode(std::string newKey, valueType newValue) { head = newKey; value = new OnePointList<valueType>(); value->push_back(newValue); leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
-    // ñïèñîê
+    // список
     treeNode(std::string newKey, OnePointList<valueType>* newValue) { head = newKey; value = newValue; leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
 };
 
@@ -156,7 +156,7 @@ struct elem
     TwoPointList<valueType>* value;
     std::string head;
     elem(std::string newKey, valueType newValue) { head = newKey; value = new TwoPointList<valueType>(); value->push_back(newValue); leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
-    // ñïèñîê
+    // список
     elem(std::string newKey, TwoPointList<valueType>* newValue) { head = newKey; value = newValue; leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
 };
 
@@ -233,7 +233,7 @@ public:
     ~AvlTree3();
 };
 
-//========================================ÑÏÈÑÊÈ========================================//
+//========================================СПИСКИ========================================//
 template<typename Type>CycleList<Type>::CycleList() {
     this->head = nullptr;
     this->size = 0;
@@ -594,7 +594,7 @@ template<typename Type>OnePointList<Type>::~OnePointList() {
     }
 }
 
-//========================================ÄÅÐÅÂÎ 1========================================//
+//========================================ДЕРЕВО 1========================================//
 
 template<typename valueType> AvlTree1< valueType>::AvlTree1() {
     this->tree1 = nullptr;
@@ -641,7 +641,7 @@ template<typename valueType> void AvlTree1< valueType>::addNode(Node< valueType>
                     pointer->balanceFactor = 0;
                     pointer = pointer1;
                 }
-                else { //äâîéíàÿ LR ðîòàöèÿ
+                else { //двойная LR ротация
                     pointer2 = pointer1->rightChild;
                     pointer1->rightChild = pointer2->leftChild;
                     pointer2->leftChild = pointer1;
@@ -893,7 +893,7 @@ template< typename valueType> Node<valueType>* AvlTree1< valueType>::search_key(
 template< typename valueType> std::string AvlTree1< valueType>::print() { std::string line; printTree(tree1, 1, line); return line; }
 
 template< typename valueType> AvlTree1< valueType>::~AvlTree1() { deleteTree(tree1); }
-//========================================ÄÅÐÅÂÎ 2========================================//
+//========================================ДЕРЕВО 2========================================//
 
 template<typename valueType> AvlTree2< valueType>::AvlTree2() {
     this->tree1 = nullptr;
@@ -1192,7 +1192,7 @@ template< typename valueType> std::string AvlTree2< valueType>::print() { std::s
 
 template< typename valueType> AvlTree2< valueType>::~AvlTree2() { deleteTree(tree1); }
 
-//========================================ÄÅÐÅÂÎ 3========================================//
+//========================================ДЕРЕВО 3========================================//
 
 template<typename valueType> AvlTree3< valueType>::AvlTree3() {
     this->tree1 = nullptr;
@@ -1492,7 +1492,7 @@ template< typename valueType> std::string AvlTree3< valueType>::print() { std::s
 
 template< typename valueType> AvlTree3< valueType>::~AvlTree3() { deleteTree(tree1); }
 
-//========================================ØÅÕ ÒÀÁËÈÖÛ========================================//
+//========================================ШЕХ ТАБЛИЦЫ========================================//
 
 class HashTable1
 {
