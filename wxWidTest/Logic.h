@@ -57,6 +57,7 @@ public:
 	int searchHT(Order data);
 	int searchHT(Subscribe data);
 	int searchHT(Client data);
+	bool HtisFull();
 	~Logic();
 };
 

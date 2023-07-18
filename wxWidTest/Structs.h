@@ -1518,9 +1518,9 @@ public:
     int HashFunc(Order* hash_key)
     {
         int hash = hash_key->getStartDate().getDay() + hash_key->getStartDate().getMonth() + hash_key->getStartDate().getYear();
-        for (int i = 0; i < hash_key->getLogin().length(); i++)hash += hash_key->getLogin()[i];
-        for (int i = 0; i < hash_key->getName().length(); i++)hash += hash_key->getName()[i];
-        for (int i = 0; i < hash_key->getCompany().length(); i++)hash += hash_key->getCompany()[i];
+        for (int i = 0; i < hash_key->getLogin().length(); i++)hash += abs(hash_key->getLogin()[i]);
+        for (int i = 0; i < hash_key->getName().length(); i++)hash += abs(hash_key->getName()[i]);
+        for (int i = 0; i < hash_key->getCompany().length(); i++)hash += abs(hash_key->getCompany()[i]);
         return ((hash * hash) / 10) % _size;
     }
 
@@ -1725,6 +1725,7 @@ private:
     htnode* table;
     //ðàçìåð òàáëèöû
     int size;
+    int count = 0;
 public:
     //êîíñòðóêòîð
     HashTable2(int n)
@@ -1768,6 +1769,7 @@ public:
                 table[hash]._status = 1;
                 table[hash]._data = userInput;
                 table[hash]._value = id;
+                count++;
                 return true;
             }
             else
@@ -1802,6 +1804,7 @@ public:
                 table[possibleId]._status = 1;
                 table[possibleId]._data = userInput;
                 table[possibleId]._value = id;
+                count++;
                 return true;
             }
             else
@@ -1809,6 +1812,7 @@ public:
                 table[collision]._status = 1;
                 table[collision]._data = userInput;
                 table[collision]._value = id;
+                count++;
                 return true;
             }
         }
@@ -1825,6 +1829,7 @@ public:
         {
             //òî ìåíÿåì ñòàòóñ íà óäàëåíî
             table[hash]._status = 2;
+            count--;
         }
         //àíàëîãè÷íî ñ äîáàâëåíèåì
         else
@@ -1842,6 +1847,7 @@ public:
         if (userInput == table[collision]._data && table[collision]._status == 1)
         {
             table[collision]._status = 2;
+            count--;
         }
         else
         {
@@ -1888,7 +1894,8 @@ public:
         }
         return res;
     }
-    //äåñòðóêòîð
+    int getCount() { return count; }
+    //деструктор
     ~HashTable2()
     {
         delete[] table;

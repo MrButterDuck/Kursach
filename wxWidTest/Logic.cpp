@@ -429,3 +429,7 @@ int Logic::searchHT(Subscribe data) {
 int Logic::searchHT(Client data) {
 	return ClientHT->search(data.getLogin());
 }
+
+bool Logic::HtisFull() {
+	return ClientHT->getCount() == this->ht_szie;
+}

@@ -101,14 +101,20 @@ InputFrame::InputFrame(const wxString& title, char type, Logic* &logic, wxMyGrid
 void InputFrame::checkData(wxCommandEvent& evt) {
 	if (type == 0 ) {
 		if (inputFields[0]->IsEmpty())wxMessageBox("Не все поля заполнены");
+		else if (inputFields[0]->GetValue().IsNumber())wxMessageBox("Введите корректный логин");
 		else if (inputFields[1]->IsEmpty())wxMessageBox("Не все поля заполнены");
+		else if (!inputFields[1]->GetValue().IsWord())wxMessageBox("Введите корректное название страны");
 		else if (inputFields[2]->IsEmpty())wxMessageBox("Не все поля заполнены");
+		else if (!inputFields[2]->GetValue().IsWord())wxMessageBox("Введите корректное название города");
 		else {
 			int day = calendar->GetDate().GetDay();
 			int month = calendar->GetDate().GetMonth();
 			int year = calendar->GetDate().GetYear();
-			Client buf = Client(std::string(inputFields[0]->GetValue().mb_str()), Date(day, month, year), std::string(inputFields[2]->GetValue().mb_str()), std::string(inputFields[1]->GetValue().mb_str()));
-			if(!logic->AddData(buf))(new wxMessageDialog(nullptr, "Запись не является уникальной", "Для мамы ты всегда уникален", wxOK))->ShowModal();
+			Client buf = Client(std::string(inputFields[0]->GetValue().MakeLower().mb_str()), Date(day, month, year), std::string(inputFields[2]->GetValue().mb_str()), std::string(inputFields[1]->GetValue().mb_str()));
+			if (!logic->AddData(buf)) {
+				if(logic->HtisFull())(new wxMessageDialog(nullptr, "Справочник клиентов переполнен", "Больше не влезет", wxOK))->ShowModal();
+				else (new wxMessageDialog(nullptr, "Запись не является уникальной", "Для мамы ты всегда уникален", wxOK))->ShowModal();
+			}
 			this->grid->update(logic->getClientList());
 			this->Close();
 		}
@@ -134,7 +140,9 @@ void InputFrame::checkData(wxCommandEvent& evt) {
 	}
 	else if (type == 1 ) {
 		if (inputFields[0]->IsEmpty())wxMessageBox("Не все поля заполнены");
+		else if (!inputFields[0]->GetValue().IsWord())wxMessageBox("Введите корректное название услуги");
 		else if (inputFields[1]->IsEmpty())wxMessageBox("Не все поля заполнены");
+		else if (!inputFields[1]->GetValue().IsWord())wxMessageBox("Введите корректного дистрибьютора");
 		else if (inputFields[2]->IsEmpty())wxMessageBox("Не все поля заполнены");
 		else if (inputFields[3]->IsEmpty())wxMessageBox("Не все поля заполнены");
 		else if (!inputFields[2]->GetValue().IsNumber())wxMessageBox("Введите корректную стоимость в месяц");
