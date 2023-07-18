@@ -5,7 +5,7 @@
 #include <typeinfo>
 #include <queue>
 
-//========================================СПИСКИ========================================//
+//========================================Г‘ГЏГ€Г‘ГЉГ€========================================//
 template<typename Type>
 struct node0
 {
@@ -121,7 +121,7 @@ public:
     ~OnePointList();
 };
 
-//========================================ДЕРЕВЬЯ========================================//
+//========================================Г„Г…ГђГ…Г‚ГњГџ========================================//
 template< typename valueType>
 struct Node
 {
@@ -131,7 +131,7 @@ struct Node
     CycleList<valueType>* value;
     std::string head;
     Node(std::string newKey, valueType newValue) { head = newKey; value = new CycleList<valueType>(); value->push_back(newValue); leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
-    // список
+    // Г±ГЇГЁГ±Г®ГЄ
     Node(std::string newKey, CycleList<valueType>* newValue) { head = newKey; value = newValue; leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
 };
 
@@ -143,7 +143,7 @@ struct treeNode {
     OnePointList<valueType> *value;
     std::string head;
     treeNode(std::string newKey, valueType newValue) { head = newKey; value = new OnePointList<valueType>(); value->push_back(newValue); leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
-    // список
+    // Г±ГЇГЁГ±Г®ГЄ
     treeNode(std::string newKey, OnePointList<valueType>* newValue) { head = newKey; value = newValue; leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
 };
 
@@ -156,7 +156,7 @@ struct elem
     TwoPointList<valueType>* value;
     std::string head;
     elem(std::string newKey, valueType newValue) { head = newKey; value = new TwoPointList<valueType>(); value->push_back(newValue); leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
-    // список
+    // Г±ГЇГЁГ±Г®ГЄ
     elem(std::string newKey, TwoPointList<valueType>* newValue) { head = newKey; value = newValue; leftChild = nullptr; rightChild = nullptr; balanceFactor = 0; }
 };
 
@@ -233,7 +233,7 @@ public:
     ~AvlTree3();
 };
 
-//========================================СПИСКИ========================================//
+//========================================Г‘ГЏГ€Г‘ГЉГ€========================================//
 template<typename Type>CycleList<Type>::CycleList() {
     this->head = nullptr;
     this->size = 0;
@@ -594,7 +594,7 @@ template<typename Type>OnePointList<Type>::~OnePointList() {
     }
 }
 
-//========================================ДЕРЕВО 1========================================//
+//========================================Г„Г…ГђГ…Г‚ГЋ 1========================================//
 
 template<typename valueType> AvlTree1< valueType>::AvlTree1() {
     this->tree1 = nullptr;
@@ -623,7 +623,7 @@ template<typename valueType> void AvlTree1< valueType>::addNode(Node< valueType>
     }
     else if (pointer->head > key) {
         addNode(pointer->leftChild, key, value);
-        if (heightChanged) { // выросла левая часть 
+        if (heightChanged) { // ГўГ»Г°Г®Г±Г«Г  Г«ГҐГўГ Гї Г·Г Г±ГІГј 
             if (pointer->balanceFactor == 1) {
                 pointer->balanceFactor = 0;
                 heightChanged = false;
@@ -635,13 +635,13 @@ template<typename valueType> void AvlTree1< valueType>::addNode(Node< valueType>
                 pointer2 = new Node< valueType>(key, value);
                 pointer1 = new Node< valueType>(key, value);
                 pointer1 = pointer->leftChild;
-                if (pointer1->balanceFactor == -1) { //одиночная LL-ротация
+                if (pointer1->balanceFactor == -1) { //Г®Г¤ГЁГ­Г®Г·Г­Г Гї LL-Г°Г®ГІГ Г¶ГЁГї
                     pointer->leftChild = pointer1->rightChild;
                     pointer1->rightChild = pointer;
                     pointer->balanceFactor = 0;
                     pointer = pointer1;
                 }
-                else { //двойная LR ротация
+                else { //Г¤ГўГ®Г©Г­Г Гї LR Г°Г®ГІГ Г¶ГЁГї
                     pointer2 = pointer1->rightChild;
                     pointer1->rightChild = pointer2->leftChild;
                     pointer2->leftChild = pointer1;
@@ -658,7 +658,7 @@ template<typename valueType> void AvlTree1< valueType>::addNode(Node< valueType>
     }
     else if (pointer->head < key) {
         addNode(pointer->rightChild, key, value);
-        if (heightChanged) { //выросла правая часть 
+        if (heightChanged) { //ГўГ»Г°Г®Г±Г«Г  ГЇГ°Г ГўГ Гї Г·Г Г±ГІГј 
             if (pointer->balanceFactor == -1) {
                 pointer->balanceFactor = 0;
                 heightChanged = false;
@@ -670,13 +670,13 @@ template<typename valueType> void AvlTree1< valueType>::addNode(Node< valueType>
                 pointer2 = new Node< valueType>(key, value);
                 pointer1 = new Node< valueType>(key, value);
                 pointer1 = pointer->rightChild;
-                if (pointer1->balanceFactor == 1) { // одиночаня RR ротация 
+                if (pointer1->balanceFactor == 1) { // Г®Г¤ГЁГ­Г®Г·Г Г­Гї RR Г°Г®ГІГ Г¶ГЁГї 
                     pointer->rightChild = pointer1->leftChild;
                     pointer1->leftChild = pointer;
                     pointer->balanceFactor = 0;
                     pointer = pointer1;
                 }
-                else { // двойная RL ротация 
+                else { // Г¤ГўГ®Г©Г­Г Гї RL Г°Г®ГІГ Г¶ГЁГї 
                     pointer2 = pointer1->leftChild;
                     pointer1->leftChild = pointer2->rightChild;
                     pointer2->rightChild = pointer1;
@@ -823,7 +823,7 @@ template< typename valueType> void AvlTree1< valueType>::_delWhenTwoChild(Node< 
 
 template< typename valueType> void AvlTree1< valueType>::delNode(Node< valueType>*& pointer, std::string key, valueType value) {
     Node< valueType>* temp = nullptr;
-    if (pointer == nullptr);//нет в дереве
+    if (pointer == nullptr);//Г­ГҐГІ Гў Г¤ГҐГ°ГҐГўГҐ
     else if (pointer->head > key) {// > 
         delNode(pointer->leftChild, key, value);
         if (heightChanged) {
@@ -893,7 +893,7 @@ template< typename valueType> Node<valueType>* AvlTree1< valueType>::search_key(
 template< typename valueType> std::string AvlTree1< valueType>::print() { std::string line; printTree(tree1, 1, line); return line; }
 
 template< typename valueType> AvlTree1< valueType>::~AvlTree1() { deleteTree(tree1); }
-//========================================ДЕРЕВО 2========================================//
+//========================================Г„Г…ГђГ…Г‚ГЋ 2========================================//
 
 template<typename valueType> AvlTree2< valueType>::AvlTree2() {
     this->tree1 = nullptr;
@@ -922,7 +922,7 @@ template<typename valueType> void AvlTree2< valueType>::addNode(treeNode< valueT
     }
     else if (pointer->head > key) {
         addNode(pointer->leftChild, key, value);
-        if (heightChanged) { // выросла левая часть 
+        if (heightChanged) { // ГўГ»Г°Г®Г±Г«Г  Г«ГҐГўГ Гї Г·Г Г±ГІГј 
             if (pointer->balanceFactor == 1) {
                 pointer->balanceFactor = 0;
                 heightChanged = false;
@@ -934,13 +934,13 @@ template<typename valueType> void AvlTree2< valueType>::addNode(treeNode< valueT
                 pointer2 = new treeNode< valueType>(key, value);
                 pointer1 = new treeNode< valueType>(key, value);
                 pointer1 = pointer->leftChild;
-                if (pointer1->balanceFactor == -1) { //одиночная LL-ротация
+                if (pointer1->balanceFactor == -1) { //Г®Г¤ГЁГ­Г®Г·Г­Г Гї LL-Г°Г®ГІГ Г¶ГЁГї
                     pointer->leftChild = pointer1->rightChild;
                     pointer1->rightChild = pointer;
                     pointer->balanceFactor = 0;
                     pointer = pointer1;
                 }
-                else { //двойная LR ротация
+                else { //Г¤ГўГ®Г©Г­Г Гї LR Г°Г®ГІГ Г¶ГЁГї
                     pointer2 = pointer1->rightChild;
                     pointer1->rightChild = pointer2->leftChild;
                     pointer2->leftChild = pointer1;
@@ -957,7 +957,7 @@ template<typename valueType> void AvlTree2< valueType>::addNode(treeNode< valueT
     }
     else if (pointer->head < key) {
         addNode(pointer->rightChild, key, value);
-        if (heightChanged) { //выросла правая часть 
+        if (heightChanged) { //ГўГ»Г°Г®Г±Г«Г  ГЇГ°Г ГўГ Гї Г·Г Г±ГІГј 
             if (pointer->balanceFactor == -1) {
                 pointer->balanceFactor = 0;
                 heightChanged = false;
@@ -969,13 +969,13 @@ template<typename valueType> void AvlTree2< valueType>::addNode(treeNode< valueT
                 pointer2 = new treeNode< valueType>(key, value);
                 pointer1 = new treeNode< valueType>(key, value);
                 pointer1 = pointer->rightChild;
-                if (pointer1->balanceFactor == 1) { // одиночаня RR ротация 
+                if (pointer1->balanceFactor == 1) { // Г®Г¤ГЁГ­Г®Г·Г Г­Гї RR Г°Г®ГІГ Г¶ГЁГї 
                     pointer->rightChild = pointer1->leftChild;
                     pointer1->leftChild = pointer;
                     pointer->balanceFactor = 0;
                     pointer = pointer1;
                 }
-                else { // двойная RL ротация 
+                else { // Г¤ГўГ®Г©Г­Г Гї RL Г°Г®ГІГ Г¶ГЁГї 
                     pointer2 = pointer1->leftChild;
                     pointer1->leftChild = pointer2->rightChild;
                     pointer2->rightChild = pointer1;
@@ -1121,7 +1121,7 @@ template< typename valueType> void AvlTree2< valueType>::_delWhenTwoChild(treeNo
 
 template< typename valueType> void AvlTree2< valueType>::delNode(treeNode< valueType>*& pointer, std::string key, valueType value) {
     treeNode< valueType>* temp = nullptr;
-    if (pointer == nullptr);//нет в дереве
+    if (pointer == nullptr);//Г­ГҐГІ Гў Г¤ГҐГ°ГҐГўГҐ
     else if (pointer->head > key) {// > 
         delNode(pointer->leftChild, key, value);
         if (heightChanged) {
@@ -1192,7 +1192,7 @@ template< typename valueType> std::string AvlTree2< valueType>::print() { std::s
 
 template< typename valueType> AvlTree2< valueType>::~AvlTree2() { deleteTree(tree1); }
 
-//========================================ДЕРЕВО 3========================================//
+//========================================Г„Г…ГђГ…Г‚ГЋ 3========================================//
 
 template<typename valueType> AvlTree3< valueType>::AvlTree3() {
     this->tree1 = nullptr;
@@ -1221,7 +1221,7 @@ template<typename valueType> void AvlTree3< valueType>::addNode(elem< valueType>
     }
     else if (pointer->head > key) {
         addNode(pointer->leftChild, key, value);
-        if (heightChanged) { // выросла левая часть 
+        if (heightChanged) { // ГўГ»Г°Г®Г±Г«Г  Г«ГҐГўГ Гї Г·Г Г±ГІГј 
             if (pointer->balanceFactor == 1) {
                 pointer->balanceFactor = 0;
                 heightChanged = false;
@@ -1233,13 +1233,13 @@ template<typename valueType> void AvlTree3< valueType>::addNode(elem< valueType>
                 pointer2 = new elem< valueType>(key, value);
                 pointer1 = new elem< valueType>(key, value);
                 pointer1 = pointer->leftChild;
-                if (pointer1->balanceFactor == -1) { //одиночная LL-ротация
+                if (pointer1->balanceFactor == -1) { //Г®Г¤ГЁГ­Г®Г·Г­Г Гї LL-Г°Г®ГІГ Г¶ГЁГї
                     pointer->leftChild = pointer1->rightChild;
                     pointer1->rightChild = pointer;
                     pointer->balanceFactor = 0;
                     pointer = pointer1;
                 }
-                else { //двойная LR ротация
+                else { //Г¤ГўГ®Г©Г­Г Гї LR Г°Г®ГІГ Г¶ГЁГї
                     pointer2 = pointer1->rightChild;
                     pointer1->rightChild = pointer2->leftChild;
                     pointer2->leftChild = pointer1;
@@ -1256,7 +1256,7 @@ template<typename valueType> void AvlTree3< valueType>::addNode(elem< valueType>
     }
     else if (pointer->head < key) {
         addNode(pointer->rightChild, key, value);
-        if (heightChanged) { //выросла правая часть 
+        if (heightChanged) { //ГўГ»Г°Г®Г±Г«Г  ГЇГ°Г ГўГ Гї Г·Г Г±ГІГј 
             if (pointer->balanceFactor == -1) {
                 pointer->balanceFactor = 0;
                 heightChanged = false;
@@ -1268,13 +1268,13 @@ template<typename valueType> void AvlTree3< valueType>::addNode(elem< valueType>
                 pointer2 = new elem< valueType>(key, value);
                 pointer1 = new elem< valueType>(key, value);
                 pointer1 = pointer->rightChild;
-                if (pointer1->balanceFactor == 1) { // одиночаня RR ротация 
+                if (pointer1->balanceFactor == 1) { // Г®Г¤ГЁГ­Г®Г·Г Г­Гї RR Г°Г®ГІГ Г¶ГЁГї 
                     pointer->rightChild = pointer1->leftChild;
                     pointer1->leftChild = pointer;
                     pointer->balanceFactor = 0;
                     pointer = pointer1;
                 }
-                else { // двойная RL ротация 
+                else { // Г¤ГўГ®Г©Г­Г Гї RL Г°Г®ГІГ Г¶ГЁГї 
                     pointer2 = pointer1->leftChild;
                     pointer1->leftChild = pointer2->rightChild;
                     pointer2->rightChild = pointer1;
@@ -1421,7 +1421,7 @@ template< typename valueType> void AvlTree3< valueType>::_delWhenTwoChild(elem< 
 
 template< typename valueType> void AvlTree3< valueType>::delNode(elem< valueType>*& pointer, std::string key, valueType value) {
     elem< valueType>* temp = nullptr;
-    if (pointer == nullptr);//нет в дереве
+    if (pointer == nullptr);//Г­ГҐГІ Гў Г¤ГҐГ°ГҐГўГҐ
     else if (pointer->head > key) {// > 
         delNode(pointer->leftChild, key, value);
         if (heightChanged) {
@@ -1492,7 +1492,7 @@ template< typename valueType> std::string AvlTree3< valueType>::print() { std::s
 
 template< typename valueType> AvlTree3< valueType>::~AvlTree3() { deleteTree(tree1); }
 
-//========================================ШЕХ ТАБЛИЦЫ========================================//
+//========================================ГГ…Г• Г’ГЂГЃГ‹Г€Г–Г›========================================//
 
 class HashTable1
 {
@@ -1714,13 +1714,13 @@ public:
 class HashTable2
 {
 private:
-    //структура для хт таблицы
+    //Г±ГІГ°ГіГЄГІГіГ°Г  Г¤Г«Гї ГµГІ ГІГ ГЎГ«ГЁГ¶Г»
     struct htnode
     {
         std::string _data;
         char _status;
         int _value;
-        //тож конструктор
+        //ГІГ®Г¦ ГЄГ®Г­Г±ГІГ°ГіГЄГІГ®Г°
         htnode(std::string data = "", int status = 0, int value = -1)
         {
             _data = data;
@@ -1729,46 +1729,44 @@ private:
         }
     };
 
-    //сама таблица
+    //Г±Г Г¬Г  ГІГ ГЎГ«ГЁГ¶Г 
     htnode* table;
-    //размер таблицы
+    //Г°Г Г§Г¬ГҐГ° ГІГ ГЎГ«ГЁГ¶Г»
     int size;
 public:
-    //конструктор
+    //ГЄГ®Г­Г±ГІГ°ГіГЄГІГ®Г°
     HashTable2(int n)
     {
         size = n;
-        //инициализация таблицы
+        //ГЁГ­ГЁГ¶ГЁГ Г«ГЁГ§Г Г¶ГЁГї ГІГ ГЎГ«ГЁГ¶Г»
         table = new htnode[size];
     }
-    //первая хф
+
     int FisrtHashFunction(std::string key)
     {
-        //перевод строки в числа
         int result = 0;
-        //модуль нужен тк код символа может быть с минусом
         for (int i = 0; i < key.length(); i++)result += abs(key[i]);
         return result % size;
     }
-    //вторая хв
+
     int SecondHashFunction(std::string key)
     {
         int result = 0;
         for (int i = 0; i < key.length(); i++)result += abs(key[i]);
         return 1 + result % (size - 2);
     }
-    //функция коллизии
+
     int CollisionFunction(int hash1, int hash2, int i)
     {
         return (hash1 + i * hash2) % size;
     };
-    //добавление
+    //Г¤Г®ГЎГ ГўГ«ГҐГ­ГЁГҐ
     bool Add(std::string userInput, int id)
     {
-        //получаем хеш
+        //ГЇГ®Г«ГіГ·Г ГҐГ¬ ГµГҐГё
         int hash = FisrtHashFunction(userInput);
-        //если ячейка имеет статус 0 или 2, те свободна
-        // если статус ноль, то добавля. иначе разрешаю коллизию
+        //ГҐГ±Г«ГЁ ГїГ·ГҐГ©ГЄГ  ГЁГ¬ГҐГҐГІ Г±ГІГ ГІГіГ± 0 ГЁГ«ГЁ 2, ГІГҐ Г±ГўГ®ГЎГ®Г¤Г­Г 
+        // ГҐГ±Г«ГЁ Г±ГІГ ГІГіГ± Г­Г®Г«Гј, ГІГ® Г¤Г®ГЎГ ГўГ«Гї. ГЁГ­Г Г·ГҐ Г°Г Г§Г°ГҐГёГ Гѕ ГЄГ®Г«Г«ГЁГ§ГЁГѕ
         if (table[hash]._status != 1)
         {
             int hash2 = SecondHashFunction(userInput);
@@ -1784,31 +1782,31 @@ public:
             }
             else
             {
-                //cout << "уже есть" << endl;
+                //cout << "ГіГ¦ГҐ ГҐГ±ГІГј" << endl;
                 return false;
             }
         }
-        //если ячейка занята то идем добавлять через коллизию
+        //ГҐГ±Г«ГЁ ГїГ·ГҐГ©ГЄГ  Г§Г Г­ГїГІГ  ГІГ® ГЁГ¤ГҐГ¬ Г¤Г®ГЎГ ГўГ«ГїГІГј Г·ГҐГ°ГҐГ§ ГЄГ®Г«Г«ГЁГ§ГЁГѕ
         else if (!(userInput == table[hash]._data))
         {
             return collisionAdd(hash, userInput, id);
         }
         else
         {
-            //cout << "уже есть" << endl;
+            //cout << "ГіГ¦ГҐ ГҐГ±ГІГј" << endl;
             return false;
         }
     }
-    //добавление с коллизией
+    //Г¤Г®ГЎГ ГўГ«ГҐГ­ГЁГҐ Г± ГЄГ®Г«Г«ГЁГ§ГЁГҐГ©
     bool collisionAdd(int hash, std::string& userInput, int id)
     {
-        //зарание получаем второй хеш для коллизии
+        //Г§Г Г°Г Г­ГЁГҐ ГЇГ®Г«ГіГ·Г ГҐГ¬ ГўГІГ®Г°Г®Г© ГµГҐГё Г¤Г«Гї ГЄГ®Г«Г«ГЁГ§ГЁГЁ
         int hash2 = SecondHashFunction(userInput);
-        //переменная нужна, чтоб отслеживать был ли добавлен ключ или нет
+        //ГЇГҐГ°ГҐГ¬ГҐГ­Г­Г Гї Г­ГіГ¦Г­Г , Г·ГІГ®ГЎ Г®ГІГ±Г«ГҐГ¦ГЁГўГ ГІГј ГЎГ»Г« Г«ГЁ Г¤Г®ГЎГ ГўГ«ГҐГ­ ГЄГ«ГѕГ· ГЁГ«ГЁ Г­ГҐГІ
         int i = 1;
         int possibleId = -1;
         int collision = CollisionFunction(hash, hash2, i);
-        //пробегаем по таблице(убрать брейки, переписать на вайл, пока колиечество попыток вставки не превысят размерность, либо не встречу ячейку с таким ключом)
+        //ГЇГ°Г®ГЎГҐГЈГ ГҐГ¬ ГЇГ® ГІГ ГЎГ«ГЁГ¶ГҐ(ГіГЎГ°Г ГІГј ГЎГ°ГҐГ©ГЄГЁ, ГЇГҐГ°ГҐГЇГЁГ±Г ГІГј Г­Г  ГўГ Г©Г«, ГЇГ®ГЄГ  ГЄГ®Г«ГЁГҐГ·ГҐГ±ГІГўГ® ГЇГ®ГЇГ»ГІГ®ГЄ ГўГ±ГІГ ГўГЄГЁ Г­ГҐ ГЇГ°ГҐГўГ»Г±ГїГІ Г°Г Г§Г¬ГҐГ°Г­Г®Г±ГІГј, Г«ГЁГЎГ® Г­ГҐ ГўГ±ГІГ°ГҐГ·Гі ГїГ·ГҐГ©ГЄГі Г± ГІГ ГЄГЁГ¬ ГЄГ«ГѕГ·Г®Г¬)
         while (table[collision]._status != 0 && !(userInput == table[collision]._data && table[collision]._status == 1) && i <= size)
         {
             if (possibleId == -1 && table[collision]._status == 2)possibleId = collision;
@@ -1831,28 +1829,28 @@ public:
                 return true;
             }
         }
-        //если не смогли добавить, то пишем, что нет места
-        else return false;//cout << "невозможно добавить " << userInput._fio << " " << userInput._hour << ":" << userInput._min << ":" << userInput._sec << endl;
+        //ГҐГ±Г«ГЁ Г­ГҐ Г±Г¬Г®ГЈГ«ГЁ Г¤Г®ГЎГ ГўГЁГІГј, ГІГ® ГЇГЁГёГҐГ¬, Г·ГІГ® Г­ГҐГІ Г¬ГҐГ±ГІГ 
+        else return false;//cout << "Г­ГҐГўГ®Г§Г¬Г®Г¦Г­Г® Г¤Г®ГЎГ ГўГЁГІГј " << userInput._fio << " " << userInput._hour << ":" << userInput._min << ":" << userInput._sec << endl;
 
     }
-    //удаление
+    //ГіГ¤Г Г«ГҐГ­ГЁГҐ
     void Delete(std::string userInput)
     {
         int hash = FisrtHashFunction(userInput);
 
-        //если ключ совпадает и ячейка занята
+        //ГҐГ±Г«ГЁ ГЄГ«ГѕГ· Г±Г®ГўГЇГ Г¤Г ГҐГІ ГЁ ГїГ·ГҐГ©ГЄГ  Г§Г Г­ГїГІГ 
         if (userInput == table[hash]._data && table[hash]._status == 1)
         {
-            //то меняем статус на удалено
+            //ГІГ® Г¬ГҐГ­ГїГҐГ¬ Г±ГІГ ГІГіГ± Г­Г  ГіГ¤Г Г«ГҐГ­Г®
             table[hash]._status = 2;
         }
-        //аналогично с добавлением
+        //Г Г­Г Г«Г®ГЈГЁГ·Г­Г® Г± Г¤Г®ГЎГ ГўГ«ГҐГ­ГЁГҐГ¬
         else
         {
             collisionDelete(hash, userInput);
         }
     }
-    // брейк убрать, фор заменить на вайл,
+    // ГЎГ°ГҐГ©ГЄ ГіГЎГ°Г ГІГј, ГґГ®Г° Г§Г Г¬ГҐГ­ГЁГІГј Г­Г  ГўГ Г©Г«,
     void collisionDelete(int hash, std::string userInput)
     {
         int hash2 = SecondHashFunction(userInput);
@@ -1865,24 +1863,24 @@ public:
         }
         else
         {
-            //cout << "Твой ключ находится в другой хеш таблице" << endl;
+            //cout << "Г’ГўГ®Г© ГЄГ«ГѕГ· Г­Г ГµГ®Г¤ГЁГІГ±Гї Гў Г¤Г°ГіГЈГ®Г© ГµГҐГё ГІГ ГЎГ«ГЁГ¶ГҐ" << endl;
         }
 
     }
-    //поиск
+    //ГЇГ®ГЁГ±ГЄ
     int search(std::string userInput)
     {
         int hash = FisrtHashFunction(userInput);
-        //тоже самое что и до этого было
+        //ГІГ®Г¦ГҐ Г±Г Г¬Г®ГҐ Г·ГІГ® ГЁ Г¤Г® ГЅГІГ®ГЈГ® ГЎГ»Г«Г®
         if (userInput == table[hash]._data && table[hash]._status == 1) {
-            //cout << "Существует" << endl;
+            //cout << "Г‘ГіГ№ГҐГ±ГІГўГіГҐГІ" << endl;
             return table[hash]._value;
         }
         else
 
             return collisionSearch(hash, userInput);
     }
-    // фор заменить на вайл, идем пока количество попыток встакви не превысят размерность таблицы или не нашел такой же
+    // ГґГ®Г° Г§Г Г¬ГҐГ­ГЁГІГј Г­Г  ГўГ Г©Г«, ГЁГ¤ГҐГ¬ ГЇГ®ГЄГ  ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® ГЇГ®ГЇГ»ГІГ®ГЄ ГўГ±ГІГ ГЄГўГЁ Г­ГҐ ГЇГ°ГҐГўГ»Г±ГїГІ Г°Г Г§Г¬ГҐГ°Г­Г®Г±ГІГј ГІГ ГЎГ«ГЁГ¶Г» ГЁГ«ГЁ Г­ГҐ Г­Г ГёГҐГ« ГІГ ГЄГ®Г© Г¦ГҐ
     int collisionSearch(int hash, std::string userInput)
     {
         int hash2 = SecondHashFunction(userInput);
@@ -1891,11 +1889,11 @@ public:
         while (table[collision]._status != 0 && !(userInput == table[collision]._data) && i <= size)collision = CollisionFunction(hash, hash2, ++i);
         if (userInput == table[collision]._data)
         {
-            //cout << "Существует" << endl;
+            //cout << "Г‘ГіГ№ГҐГ±ГІГўГіГҐГІ" << endl;
             return table[collision]._value;
         }
         else
-           // cout << "Не существует" << endl;
+           // cout << "ГЌГҐ Г±ГіГ№ГҐГ±ГІГўГіГҐГІ" << endl;
         return -1;
     }
 
@@ -1908,7 +1906,7 @@ public:
         }
         return res;
     }
-    //деструктор
+    //Г¤ГҐГ±ГІГ°ГіГЄГІГ®Г°
     ~HashTable2()
     {
         delete[] table;
@@ -1941,9 +1939,9 @@ public:
         if (a > 1)
         {
             k = a;
-            //cout << "K = " << a << " установлен" << endl;
+            //cout << "K = " << a << " ГіГ±ГІГ Г­Г®ГўГ«ГҐГ­" << endl;
         }
-        //else cout << "Данные некорректны" << endl;
+        //else cout << "Г„Г Г­Г­Г»ГҐ Г­ГҐГЄГ®Г°Г°ГҐГЄГІГ­Г»" << endl;
     }
 
     int stringToInt(const std::string& str) {
@@ -2139,7 +2137,7 @@ public:
         int step = secondary_hash(index, attempt, k);
         if (status[index] == 1 && data[index] == *object)
         {
-            //cout << "Элемент был найден." << endl;
+            //cout << "ГќГ«ГҐГ¬ГҐГ­ГІ ГЎГ»Г« Г­Г Г©Г¤ГҐГ­." << endl;
             return value[index];
         }
         else
@@ -2150,11 +2148,11 @@ public:
                 attempt++;
                 if (attempt > size || status[step] == 0)
                 {
-                    //cout << "Элемент не был найден." << endl;
+                    //cout << "ГќГ«ГҐГ¬ГҐГ­ГІ Г­ГҐ ГЎГ»Г« Г­Г Г©Г¤ГҐГ­." << endl;
                     return -1;
                 }
                 if (status[index] == 1 && data[index] == *object) {
-                    //cout << "Элемент был найден." << endl;
+                    //cout << "ГќГ«ГҐГ¬ГҐГ­ГІ ГЎГ»Г« Г­Г Г©Г¤ГҐГ­." << endl;
                     return value[index];
                 }
             }
