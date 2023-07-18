@@ -623,7 +623,7 @@ template<typename valueType> void AvlTree1< valueType>::addNode(Node< valueType>
     }
     else if (pointer->head > key) {
         addNode(pointer->leftChild, key, value);
-        if (heightChanged) { // âûðîñëà ëåâàÿ ÷àñòü 
+        if (heightChanged) {
             if (pointer->balanceFactor == 1) {
                 pointer->balanceFactor = 0;
                 heightChanged = false;
@@ -635,7 +635,7 @@ template<typename valueType> void AvlTree1< valueType>::addNode(Node< valueType>
                 pointer2 = new Node< valueType>(key, value);
                 pointer1 = new Node< valueType>(key, value);
                 pointer1 = pointer->leftChild;
-                if (pointer1->balanceFactor == -1) { //îäèíî÷íàÿ LL-ðîòàöèÿ
+                if (pointer1->balanceFactor == -1) { 
                     pointer->leftChild = pointer1->rightChild;
                     pointer1->rightChild = pointer;
                     pointer->balanceFactor = 0;
@@ -658,7 +658,7 @@ template<typename valueType> void AvlTree1< valueType>::addNode(Node< valueType>
     }
     else if (pointer->head < key) {
         addNode(pointer->rightChild, key, value);
-        if (heightChanged) { //âûðîñëà ïðàâàÿ ÷àñòü 
+        if (heightChanged) {
             if (pointer->balanceFactor == -1) {
                 pointer->balanceFactor = 0;
                 heightChanged = false;
@@ -670,13 +670,13 @@ template<typename valueType> void AvlTree1< valueType>::addNode(Node< valueType>
                 pointer2 = new Node< valueType>(key, value);
                 pointer1 = new Node< valueType>(key, value);
                 pointer1 = pointer->rightChild;
-                if (pointer1->balanceFactor == 1) { // îäèíî÷àíÿ RR ðîòàöèÿ 
+                if (pointer1->balanceFactor == 1) { 
                     pointer->rightChild = pointer1->leftChild;
                     pointer1->leftChild = pointer;
                     pointer->balanceFactor = 0;
                     pointer = pointer1;
                 }
-                else { // äâîéíàÿ RL ðîòàöèÿ 
+                else { 
                     pointer2 = pointer1->leftChild;
                     pointer1->leftChild = pointer2->rightChild;
                     pointer2->rightChild = pointer1;
@@ -1583,7 +1583,6 @@ public:
             }
             else
             {
-                //std::cout << "~Already added: " << key.passangerName << " " << key.flightNumbers << std::endl;
                 return false;
             }
         }
@@ -1593,7 +1592,6 @@ public:
         }
         else
         {
-            //std::cout << "+Already added: " << key.passangerName << " " << key.flightNumbers << std::endl;
             return false;
         }
         if ((float(count) / _size) > 0.75)Resize(_size + _userSize);
@@ -1616,7 +1614,6 @@ public:
         }
         else if (table[hash] == *key)
         {
-            //std::cout << "-Already added: " << key.passangerName << " " << key.flightNumbers << std::endl;
             return false;
         }
 
@@ -1655,10 +1652,7 @@ public:
                 Resize(_size - _userSize);
             }
         }
-        else
-        {
-            //std::cout << "Nothing to delete: " << key.passangerName << " " << key.flightNumbers << std::endl;
-        }
+
     }
 
     void colDel(int hash, Order* key)
@@ -1674,9 +1668,7 @@ public:
             col = CollideFunc(hash, ++i);
         }
         if (del == -1)
-        {
-            //std::cout << "nothing to delete: " << key.passangerName << " " << key.flightNumbers << std::endl;
-        }
+        {}
         else
         {
             table[del] = table[last];
@@ -1763,10 +1755,8 @@ public:
     //äîáàâëåíèå
     bool Add(std::string userInput, int id)
     {
-        //ïîëó÷àåì õåø
         int hash = FisrtHashFunction(userInput);
-        //åñëè ÿ÷åéêà èìååò ñòàòóñ 0 èëè 2, òå ñâîáîäíà
-        // åñëè ñòàòóñ íîëü, òî äîáàâëÿ. èíà÷å ðàçðåøàþ êîëëèçèþ
+
         if (table[hash]._status != 1)
         {
             int hash2 = SecondHashFunction(userInput);
@@ -1782,31 +1772,24 @@ public:
             }
             else
             {
-                //cout << "óæå åñòü" << endl;
                 return false;
             }
         }
-        //åñëè ÿ÷åéêà çàíÿòà òî èäåì äîáàâëÿòü ÷åðåç êîëëèçèþ
         else if (!(userInput == table[hash]._data))
         {
             return collisionAdd(hash, userInput, id);
         }
         else
         {
-            //cout << "óæå åñòü" << endl;
             return false;
         }
     }
-    //äîáàâëåíèå ñ êîëëèçèåé
     bool collisionAdd(int hash, std::string& userInput, int id)
     {
-        //çàðàíèå ïîëó÷àåì âòîðîé õåø äëÿ êîëëèçèè
         int hash2 = SecondHashFunction(userInput);
-        //ïåðåìåííàÿ íóæíà, ÷òîá îòñëåæèâàòü áûë ëè äîáàâëåí êëþ÷ èëè íåò
         int i = 1;
         int possibleId = -1;
         int collision = CollisionFunction(hash, hash2, i);
-        //ïðîáåãàåì ïî òàáëèöå(óáðàòü áðåéêè, ïåðåïèñàòü íà âàéë, ïîêà êîëèå÷åñòâî ïîïûòîê âñòàâêè íå ïðåâûñÿò ðàçìåðíîñòü, ëèáî íå âñòðå÷ó ÿ÷åéêó ñ òàêèì êëþ÷îì)
         while (table[collision]._status != 0 && !(userInput == table[collision]._data && table[collision]._status == 1) && i <= size)
         {
             if (possibleId == -1 && table[collision]._status == 2)possibleId = collision;
@@ -1829,11 +1812,10 @@ public:
                 return true;
             }
         }
-        //åñëè íå ñìîãëè äîáàâèòü, òî ïèøåì, ÷òî íåò ìåñòà
-        else return false;//cout << "íåâîçìîæíî äîáàâèòü " << userInput._fio << " " << userInput._hour << ":" << userInput._min << ":" << userInput._sec << endl;
+        else return false;
 
     }
-    //óäàëåíèå
+
     void Delete(std::string userInput)
     {
         int hash = FisrtHashFunction(userInput);
