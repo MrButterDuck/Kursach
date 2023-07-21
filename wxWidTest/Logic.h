@@ -51,12 +51,12 @@ public:
 	void readFromFile(std::string path);
 	void writeToFile(std::string path);
 	void Clear(int type);
-	CycleList<int>* searchData(std::string* login, std::string* Name, std::string* Company, Date startDate);
-	OnePointList<int>* searchData(std::string* Name, std::string* Company, std::string* cost, std::string* dur);
-	TwoPointList<int>* searchData(Date date, std::string* Country, std::string* Town);
-	int searchHT(Order data);
-	int searchHT(Subscribe data);
-	int searchHT(Client data);
+	CycleList<int>* searchData(std::string* login, std::string* Name, std::string* Company, Date startDate, int& steps);
+	OnePointList<int>* searchData(std::string* Name, std::string* Company, std::string* cost, std::string* dur, int& steps);
+	TwoPointList<int>* searchData(Date date, std::string* Country, std::string* Town, int& steps);
+	int searchHT(Order data, int& steps);
+	int searchHT(Subscribe data, int& steps);
+	int searchHT(Client data, int& steps);
 	bool HtisFull();
 	~Logic();
 };

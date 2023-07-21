@@ -26,8 +26,8 @@ InputFrame::InputFrame(const wxString& title, char type, Logic* &logic, wxMyGrid
 		else {
 			wxArrayString choices;
 			choices.Add("по логину");
-			choices.Add("по стране");
 			choices.Add("по городу");
+			choices.Add("по стране");
 			choices.Add("по дате");
 			this->choice = new wxChoice(panel, 220, wxPoint(30, 260), wxSize(80, 20), choices);
 			this->choice->Select(0);
@@ -103,9 +103,9 @@ void InputFrame::checkData(wxCommandEvent& evt) {
 		if (inputFields[0]->IsEmpty())wxMessageBox("Не все поля заполнены");
 		else if (inputFields[0]->GetValue().IsNumber())wxMessageBox("Введите корректный логин");
 		else if (inputFields[1]->IsEmpty())wxMessageBox("Не все поля заполнены");
-		else if (!inputFields[1]->GetValue().IsWord())wxMessageBox("Введите корректное название страны");
+		else if (!inputFields[1]->GetValue().IsWord())wxMessageBox("Введите корректное название горда");
 		else if (inputFields[2]->IsEmpty())wxMessageBox("Не все поля заполнены");
-		else if (!inputFields[2]->GetValue().IsWord())wxMessageBox("Введите корректное название города");
+		else if (!inputFields[2]->GetValue().IsWord())wxMessageBox("Введите корректное название страны");
 		else {
 			int day = calendar->GetDate().GetDay();
 			int month = calendar->GetDate().GetMonth();
@@ -162,90 +162,175 @@ void InputFrame::checkData(wxCommandEvent& evt) {
 }
 
 void InputFrame::searchData(wxCommandEvent& evt) {
+	int steps = 0;
 	if (type == 3) {
 		if (choice->GetSelection() == 0 && !inputFields[0]->IsEmpty()) {
-			int res = logic->searchHT(Client(inputFields[0]->GetValue().ToStdString(), Date(), " ", " "));
-			if (res != -1)this->grid->printSearch(res, logic->getClientList()->at(res));
-			else this->grid->clearGrid();
+			int res = logic->searchHT(Client(inputFields[0]->GetValue().ToStdString(), Date(), " ", " "), steps);
+			if (res != -1){
+				this->grid->printSearch(res, logic->getClientList()->at(res));
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		else if (choice->GetSelection() == 1 && !inputFields[1]->IsEmpty()) {
 			std::string buf = inputFields[1]->GetValue().ToStdString();
-			TwoPointList<int>* res = logic->searchData(Date(), &buf, nullptr);
-			if (res)this->grid->printSearch(res, logic->getClientList());
-			else this->grid->clearGrid();
+			TwoPointList<int>* res = logic->searchData(Date(), nullptr, &buf, steps);
+			if (res){
+				this->grid->printSearch(res, logic->getClientList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		else if (choice->GetSelection() == 2 && !inputFields[2]->IsEmpty()) {
 			std::string buf = inputFields[2]->GetValue().ToStdString();
-			TwoPointList<int>* res = logic->searchData(Date(), nullptr, &buf);
-			if (res)this->grid->printSearch(res, logic->getClientList());
-			else this->grid->clearGrid();
+			TwoPointList<int>* res = logic->searchData(Date(), &buf, nullptr, steps);
+			if (res){
+				this->grid->printSearch(res, logic->getClientList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		else if (choice->GetSelection() == 3) {
-			TwoPointList<int>* res = logic->searchData(Date(calendar->GetDate().GetDay(), calendar->GetDate().GetMonth(), calendar->GetDate().GetYear()), nullptr, nullptr);
-			if (res)this->grid->printSearch(res, logic->getClientList());
-			else this->grid->clearGrid();
+			TwoPointList<int>* res = logic->searchData(Date(calendar->GetDate().GetDay(), calendar->GetDate().GetMonth(), calendar->GetDate().GetYear()), nullptr, nullptr, steps);
+			if (res){
+				this->grid->printSearch(res, logic->getClientList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 
 	}
 	else if (type == 4) {
 		if (choice->GetSelection() == 0 && !inputFields[0]->IsEmpty()) {
 			std::string buf = inputFields[0]->GetValue().ToStdString();
-			OnePointList<int>* res = logic->searchData(&buf, nullptr, nullptr, nullptr);
-			if (res)this->grid->printSearch(res, logic->getSubscribesList());
-			else this->grid->clearGrid();
+			OnePointList<int>* res = logic->searchData(&buf, nullptr, nullptr, nullptr, steps);
+			if (res){
+				this->grid->printSearch(res, logic->getSubscribesList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		else if (choice->GetSelection() == 1 && !inputFields[1]->IsEmpty()) {
 			std::string buf = inputFields[1]->GetValue().ToStdString();
-			OnePointList<int>* res = logic->searchData(nullptr, &buf, nullptr, nullptr);
-			if (res)this->grid->printSearch(res, logic->getSubscribesList());
-			else this->grid->clearGrid();
+			OnePointList<int>* res = logic->searchData(nullptr, &buf, nullptr, nullptr, steps);
+			if (res){
+				this->grid->printSearch(res, logic->getSubscribesList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		else if (choice->GetSelection() == 2 && !inputFields[2]->IsEmpty()) {
 			std::string buf = inputFields[2]->GetValue().ToStdString();
-			OnePointList<int>* res = logic->searchData(nullptr, nullptr, &buf, nullptr);
-			if (res)this->grid->printSearch(res, logic->getSubscribesList());
-			else this->grid->clearGrid();
+			OnePointList<int>* res = logic->searchData(nullptr, nullptr, &buf, nullptr, steps);
+			if (res){
+				this->grid->printSearch(res, logic->getSubscribesList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		else if (choice->GetSelection() == 3) {
 			std::string buf = inputFields[3]->GetValue().ToStdString();
-			OnePointList<int>* res = logic->searchData(nullptr , nullptr, nullptr, &buf);
-			if (res)this->grid->printSearch(res, logic->getSubscribesList());
-			else this->grid->clearGrid();
+			OnePointList<int>* res = logic->searchData(nullptr , nullptr, nullptr, &buf, steps);
+			if (res){
+				this->grid->printSearch(res, logic->getSubscribesList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		if (choice->GetSelection() == 4 && !inputFields[0]->IsEmpty() && !inputFields[1]->IsEmpty()) {
-			int res = logic->searchHT(Subscribe(inputFields[0]->GetValue().ToStdString(), inputFields[0]->GetValue().ToStdString(), -1, -1));
-			if (res != -1)this->grid->printSearch(res, logic->getSubscribesList()->at(res));
-			else this->grid->clearGrid();
+			int res = logic->searchHT(Subscribe(inputFields[0]->GetValue().ToStdString(), inputFields[1]->GetValue().ToStdString(), -1, -1), steps);
+			if (res != -1){
+				this->grid->printSearch(res, logic->getSubscribesList()->at(res));
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 	}
 	else if (type == 5) {
 		if (choice->GetSelection() == 0 && !inputFields[0]->IsEmpty()) {
 			std::string buf = inputFields[0]->GetValue().ToStdString();
-			CycleList<int>* res = logic->searchData(&buf, nullptr, nullptr, Date());
-			if (res)this->grid->printSearch(res, logic->getOrderList());
-			else this->grid->clearGrid();
+			CycleList<int>* res = logic->searchData(&buf, nullptr, nullptr, Date(), steps);
+			if (res){
+				this->grid->printSearch(res, logic->getOrderList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		else if (choice->GetSelection() == 1 && !inputFields[1]->IsEmpty()) {
 			std::string buf = inputFields[1]->GetValue().ToStdString();
-			CycleList<int>* res = logic->searchData(nullptr, &buf, nullptr, Date());
-			if (res)this->grid->printSearch(res, logic->getOrderList());
-			else this->grid->clearGrid();
+			CycleList<int>* res = logic->searchData(nullptr, &buf, nullptr, Date(), steps);
+			if (res){
+				this->grid->printSearch(res, logic->getOrderList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		else if (choice->GetSelection() == 2 && !inputFields[2]->IsEmpty()) {
 			std::string buf = inputFields[2]->GetValue().ToStdString();
-			CycleList<int>* res = logic->searchData(nullptr, nullptr, &buf, Date());
-			if (res)this->grid->printSearch(res, logic->getOrderList());
-			else this->grid->clearGrid();
+			CycleList<int>* res = logic->searchData(nullptr, nullptr, &buf, Date(), steps);
+			if (res){
+				this->grid->printSearch(res, logic->getOrderList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		else if (choice->GetSelection() == 3) {
-			CycleList<int>* res = logic->searchData(nullptr, nullptr, nullptr, Date(calendar->GetDate().GetDay(), calendar->GetDate().GetMonth(), calendar->GetDate().GetYear()));
-			if (res)this->grid->printSearch(res, logic->getOrderList());
-			else this->grid->clearGrid();
+			CycleList<int>* res = logic->searchData(nullptr, nullptr, nullptr, Date(calendar->GetDate().GetDay(), calendar->GetDate().GetMonth(), calendar->GetDate().GetYear()), steps);
+			if (res){
+				this->grid->printSearch(res, logic->getOrderList());
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 		if (choice->GetSelection() == 4 && !inputFields[0]->IsEmpty() && !inputFields[1]->IsEmpty() && !inputFields[2]->IsEmpty()) {
-			int res = logic->searchHT(Order(inputFields[0]->GetValue().ToStdString(), inputFields[1]->GetValue().ToStdString(), inputFields[2]->GetValue().ToStdString(), Date(calendar->GetDate().GetDay(), calendar->GetDate().GetMonth(), calendar->GetDate().GetYear())));
-			if (res != -1)this->grid->printSearch(res, logic->getSubscribesList()->at(res));
-			else this->grid->clearGrid();
+			int res = logic->searchHT(Order(inputFields[0]->GetValue().ToStdString(), inputFields[1]->GetValue().ToStdString(), inputFields[2]->GetValue().ToStdString(), Date(calendar->GetDate().GetDay(), calendar->GetDate().GetMonth(), calendar->GetDate().GetYear())), steps);
+			if (res != -1) {
+				this->grid->printSearch(res, logic->getOrderList()->at(res));
+				(new wxMessageDialog(nullptr, "Результат был найден за " + std::to_string(steps) + " итерацию(ии)", "Циферки", wxOK))->ShowModal();
+			}
+			else {
+				this->grid->clearGrid();
+				(new wxMessageDialog(nullptr, "Не удалось ничего найти", "Простофиля", wxOK))->ShowModal();
+			}
 		}
 	}
 }

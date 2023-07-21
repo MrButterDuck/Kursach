@@ -14,7 +14,6 @@ Logic::Logic(int size, int k) {
 	this->SubscribeCostTree = new AvlTree2< int>;
 	this->SubscribeMinDurTree = new AvlTree2< int>;
 	this->SubscribeHT = new HashTable3(100);
-	this->SubscribeHT->setK(ht_k);
 
 
 	this->ClientCountryTree = new AvlTree3< int>;
@@ -100,10 +99,10 @@ void Logic::DeleteOrderData(int id) {
 }
 
 bool Logic::DeleteSubscribeData(int id) {
-
+	int stps = 0;
 	Subscribe data = this->Subscribes.at(id);
 	std::string dataName = data.getName();
-	if (this->searchData(nullptr, &dataName, nullptr, Date()))return false;
+	if (this->searchData(nullptr, &dataName, nullptr, Date(), stps))return false;
 	this->SubscribeNameTree->delete_key(data.getName(), id);
 	this->SubscribeCompanyTree->delete_key(data.getCompany(), id);
 	this->SubscribeCostTree->delete_key(std::to_string(data.getCost()), id);
@@ -132,10 +131,11 @@ bool Logic::DeleteSubscribeData(int id) {
 
 }
 
-bool Logic::DeleteClientData(int id) {	
+bool Logic::DeleteClientData(int id) {
+	int stps = 0;
 	Client data = this->Clients.at(id);
 	std::string dataLogin = data.getLogin();
-	if (this->searchData(&dataLogin, nullptr, nullptr, Date()))return false;
+	if (this->searchData(&dataLogin, nullptr, nullptr, Date(), stps))return false;
 	this->ClientCountryTree->delete_key(data.getCountry(), id);
 	this->ClientTownTree->delete_key(data.getTown(), id);
 	this->ClientDateTree->delete_key(data.getDate().toString(), id);
@@ -351,65 +351,65 @@ void Logic::Clear(int type) {
 	}
 }
 
-CycleList<int>* Logic::searchData(std::string* login, std::string* Name, std::string* Company, Date startDate) {
+CycleList<int>* Logic::searchData(std::string* login, std::string* Name, std::string* Company, Date startDate, int& steps) {
 	if (login) {
-		Node<int>* res = OrderLoginTree->search_key(*login);
+		Node<int>* res = OrderLoginTree->search_key(*login, steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
 	else if (Name) {
-		Node<int>* res = OrderNameTree->search_key(*Name);
+		Node<int>* res = OrderNameTree->search_key(*Name, steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
 	else if (Company) {
-		Node<int>* res = OrderCompanyTree->search_key(*Company);
+		Node<int>* res = OrderCompanyTree->search_key(*Company, steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
 	else {
-		Node<int>* res = OrderDateTree->search_key(startDate.toString());
+		Node<int>* res = OrderDateTree->search_key(startDate.toString(), steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
 }
 
-OnePointList<int>* Logic::searchData(std::string* Name, std::string* Company, std::string* cost, std::string* dur) {
+OnePointList<int>* Logic::searchData(std::string* Name, std::string* Company, std::string* cost, std::string* dur, int& steps) {
 	if (Name) {
-		treeNode<int>* res = SubscribeNameTree->search_key(*Name);
+		treeNode<int>* res = SubscribeNameTree->search_key(*Name, steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
 	else if (Company) {
-		treeNode<int>* res = SubscribeCompanyTree->search_key(*Company);
+		treeNode<int>* res = SubscribeCompanyTree->search_key(*Company, steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
 	else if (cost) {
-		treeNode<int>* res  = SubscribeCostTree->search_key(*cost);
+		treeNode<int>* res  = SubscribeCostTree->search_key(*cost, steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
 	else {
-		treeNode<int>* res = SubscribeMinDurTree->search_key(*dur);
+		treeNode<int>* res = SubscribeMinDurTree->search_key(*dur, steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
 }
 
-TwoPointList<int>* Logic::searchData(Date date, std::string* Country, std::string* Town) {
+TwoPointList<int>* Logic::searchData(Date date, std::string* Country, std::string* Town, int& steps) {
 	if (Country) {
-		elem<int>* res = ClientCountryTree->search_key(*Country);
+		elem<int>* res = ClientCountryTree->search_key(*Country, steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
 	else if (Town) {
-		elem<int>* res = ClientTownTree->search_key(*Town);
+		elem<int>* res = ClientTownTree->search_key(*Town, steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
 	else {
-		elem<int>* res = ClientDateTree->search_key(date.toString());
+		elem<int>* res = ClientDateTree->search_key(date.toString(), steps);
 		if (res)return res->value;
 		else return nullptr;
 	}
@@ -417,17 +417,17 @@ TwoPointList<int>* Logic::searchData(Date date, std::string* Country, std::strin
 }
 
 
-int Logic::searchHT(Order data) {
-	return OrderHT->Find(&data);
+int Logic::searchHT(Order data, int& steps) {
+	return OrderHT->Find(&data, steps);
 }
 
-int Logic::searchHT(Subscribe data) {
+int Logic::searchHT(Subscribe data, int& steps) {
 	std::string key = data.getName() + data.getCompany();
-	return SubscribeHT->find(&key);
+	return SubscribeHT->find(&key, steps);
 }
 
-int Logic::searchHT(Client data) {
-	return ClientHT->search(data.getLogin());
+int Logic::searchHT(Client data, int& steps) {
+	return ClientHT->search(data.getLogin(), steps);
 }
 
 bool Logic::HtisFull() {

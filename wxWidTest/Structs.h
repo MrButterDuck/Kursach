@@ -174,13 +174,13 @@ private:
     void _del_balanceRight(Node<valueType>*& node);
     void _delWhenTwoChild(Node<valueType>*& node, Node<valueType>*& delNode);
     void delNode(Node<valueType>*& pointer, std::string key, valueType value);
-    void searchTreeNode(Node<valueType>* pointer, std::string key, Node<valueType>*& res);
+    void searchTreeNode(Node<valueType>* pointer, std::string key, Node<valueType>*& res, int &steps);
 
 public:
     AvlTree1();
     void push(std::string key, valueType value);
     void delete_key(std::string key, valueType value);
-    Node<valueType>* search_key(std::string key);
+    Node<valueType>* search_key(std::string key, int& steps);
     std::string print();
     ~AvlTree1();
 };
@@ -198,13 +198,13 @@ private:
     void _del_balanceRight(treeNode<valueType>*& node);
     void _delWhenTwoChild(treeNode<valueType>*& node, treeNode<valueType>*& delNode);
     void delNode(treeNode<valueType>*& pointer, std::string key, valueType value);
-    void searchTreeNode(treeNode<valueType>* pointer, std::string key, treeNode<valueType>*& res);
+    void searchTreeNode(treeNode<valueType>* pointer, std::string key, treeNode<valueType>*& res, int &steps);
 
 public:
     AvlTree2();
     void push(std::string key, valueType value);
     void delete_key(std::string key, valueType value);
-    treeNode<valueType>* search_key(std::string key);
+    treeNode<valueType>* search_key(std::string key, int& steps);
     std::string print();
     ~AvlTree2();
 };
@@ -222,13 +222,13 @@ private:
     void _del_balanceRight(elem<valueType>*& node);
     void _delWhenTwoChild(elem<valueType>*& node, elem<valueType>*& delNode);
     void delNode(elem<valueType>*& pointer, std::string key, valueType value);
-    void searchTreeNode(elem<valueType>* pointer, std::string key, elem<valueType>*& res);
+    void searchTreeNode(elem<valueType>* pointer, std::string key, elem<valueType>*& res, int &steps);
 
 public:
     AvlTree3();
     void push(std::string key, valueType value);
     void delete_key(std::string key, valueType value);
-    elem<valueType>* search_key(std::string key);
+    elem<valueType>* search_key(std::string key, int& steps);
     std::string print();
     ~AvlTree3();
 };
@@ -362,10 +362,10 @@ template<typename Type> void CycleList<Type>::print(std::string &line)
         int i = 1;
         while (buffer->next != this->head)
         {
-            line += std::to_string(buffer->data) + ",";
+            line += std::to_string(buffer->data+1) + ",";
             buffer = buffer->next;
         }
-        line += std::to_string(buffer->data);
+        line += std::to_string(buffer->data+1);
     }
 }
 
@@ -468,7 +468,7 @@ template<typename Type> void TwoPointList<Type>::print_list(std::string &line) {
     if (head) {
         node1<Type>* buffer = head;
         while (buffer != nullptr) {
-            line += std::to_string(buffer->data) + ",";
+            line += std::to_string(buffer->data+1) + ",";
             buffer = buffer->next;
         }
     }
@@ -573,7 +573,7 @@ template<typename Type>  void OnePointList<Type>::print_list(std::string &line) 
     if (head) {
         node2<Type>* buffer = head;
         while (buffer != nullptr) {
-            line += std::to_string(buffer->data) + ",";
+            line += std::to_string(buffer->data+1) + ",";
             buffer = buffer->next;
         }
     }
@@ -862,19 +862,22 @@ template< typename valueType> void AvlTree1< valueType>::delNode(Node< valueType
     }
 }
 
-template< typename valueType> void AvlTree1< valueType>::searchTreeNode(Node< valueType>* pointer, std::string key, Node<valueType>*& res) {
+template< typename valueType> void AvlTree1< valueType>::searchTreeNode(Node< valueType>* pointer, std::string key, Node<valueType>*& res, int &steps) {
     if (pointer != NULL) {
         if (pointer->head > key) {
             if (pointer->leftChild != nullptr) {
-                searchTreeNode(pointer->leftChild, key, res);
+                steps++;
+                searchTreeNode(pointer->leftChild, key, res, steps);
             }
         }
         else if (pointer->head < key) {
             if (pointer->rightChild != nullptr) {
-                searchTreeNode(pointer->rightChild, key, res);
+                steps++;
+                searchTreeNode(pointer->rightChild, key, res, steps);
             }
         }
         else {
+            steps++;
             res = pointer;
         }
     }
@@ -884,9 +887,9 @@ template< typename valueType> void AvlTree1< valueType>::push(std::string key, v
 
 template<typename valueType> void AvlTree1< valueType>::delete_key(std::string key, valueType value) { delNode(tree1, key, value); }
 
-template< typename valueType> Node<valueType>* AvlTree1< valueType>::search_key(std::string key) {
+template< typename valueType> Node<valueType>* AvlTree1< valueType>::search_key(std::string key, int& steps) {
     Node< valueType>* res = nullptr;
-    searchTreeNode(tree1, key, res);
+    searchTreeNode(tree1, key, res, steps);
     return res;
 }
 
@@ -1160,19 +1163,22 @@ template< typename valueType> void AvlTree2< valueType>::delNode(treeNode< value
     }
 }
 
-template< typename valueType> void AvlTree2< valueType>::searchTreeNode(treeNode< valueType>* pointer, std::string key,treeNode<valueType>*& res) {
+template< typename valueType> void AvlTree2< valueType>::searchTreeNode(treeNode< valueType>* pointer, std::string key,treeNode<valueType>*& res, int &steps) {
     if (pointer != NULL) {
         if (pointer->head > key) {
             if (pointer->leftChild != nullptr) {
-                searchTreeNode(pointer->leftChild, key,  res);
+                steps++;
+                searchTreeNode(pointer->leftChild, key,  res, steps);
             }
         }
         else if (pointer->head < key) {
             if (pointer->rightChild != nullptr) {
-                searchTreeNode(pointer->rightChild, key,  res);
+                steps++;
+                searchTreeNode(pointer->rightChild, key,  res, steps);
             }
         }
         else {
+            steps++;
             res = pointer;
         }
     }
@@ -1182,9 +1188,9 @@ template< typename valueType> void AvlTree2< valueType>::push(std::string key, v
 
 template<typename valueType> void AvlTree2< valueType>::delete_key(std::string key, valueType value) { delNode(tree1, key, value); }
 
-template< typename valueType> treeNode< valueType>* AvlTree2< valueType>::search_key(std::string key ) {
+template< typename valueType> treeNode< valueType>* AvlTree2< valueType>::search_key(std::string key, int& steps) {
     treeNode< valueType>* res = nullptr;
-    searchTreeNode(tree1, key, res);
+    searchTreeNode(tree1, key, res, steps);
     return res;
 }
 
@@ -1460,19 +1466,22 @@ template< typename valueType> void AvlTree3< valueType>::delNode(elem< valueType
     }
 }
 
-template< typename valueType> void AvlTree3< valueType>::searchTreeNode(elem< valueType>* pointer, std::string key, elem<valueType>*& res) {
+template< typename valueType> void AvlTree3< valueType>::searchTreeNode(elem< valueType>* pointer, std::string key, elem<valueType>*& res, int &steps) {
     if (pointer != NULL) {
         if (pointer->head > key) {
             if (pointer->leftChild != nullptr) {
-                searchTreeNode(pointer->leftChild, key, res);
+                steps++;
+                searchTreeNode(pointer->leftChild, key, res, steps);
             }
         }
         else if (pointer->head < key) {
             if (pointer->rightChild != nullptr) {
-                searchTreeNode(pointer->rightChild, key, res);
+                steps++;
+                searchTreeNode(pointer->rightChild, key, res, steps);
             }
         }
         else {
+            steps++;
             res = pointer;
         }
     }
@@ -1482,9 +1491,9 @@ template< typename valueType> void AvlTree3< valueType>::push(std::string key, v
 
 template<typename valueType> void AvlTree3< valueType>::delete_key(std::string key, valueType value) { delNode(tree1, key, value); }
 
-template< typename valueType> elem< valueType>* AvlTree3< valueType>::search_key(std::string key) {
+template< typename valueType> elem< valueType>* AvlTree3< valueType>::search_key(std::string key, int& steps) {
     elem< valueType>* res = nullptr;
-    searchTreeNode(tree1, key, res);
+    searchTreeNode(tree1, key, res, steps);
     return res;
 }
 
@@ -1500,6 +1509,7 @@ private:
     Order* table;
     int* value;
     char* status;
+    int c1, c2;
     unsigned int _userSize;
     unsigned int _size;
     unsigned int count = 0;
@@ -1513,6 +1523,20 @@ public:
         //for(int i = 0; i < _size; i++)table[i]
         status = new char[_size];
         memset(status, 0, _size);
+        c1 = Prime(2, this->_size);
+        c2 = Prime(c1, this->_size);
+    }
+
+    int Prime(int lIndex, int hIndex)
+    {
+        for (int i = lIndex; i < hIndex; i++)
+        {
+            if (hIndex % i != 0)
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     int HashFunc(Order* hash_key)
@@ -1534,33 +1558,34 @@ public:
         std::string res = "";
         for (int i = 0; i < _size; i++)
         {
-            if (status[i] == 1)res +=  table[i].getLogin() + " " + table[i].getName() + " " + table[i].getCompany() + " " + table[i].getStartDate().toString() + " = " + std::to_string(value[i]) + "\n";
+            if (status[i] == 1)res += std::to_string(i) + ": " + table[i].getLogin() + " " + table[i].getName() + " " + table[i].getCompany() + " " + table[i].getStartDate().toString() + " = " + std::to_string(value[i]+1) + "\n";
         }
         return res;
     }
 
-    int Find(Order* key)
+    int Find(Order* key, int &steps)
     {
         int hash = HashFunc(key);
         if (status[hash] != 0)
-        {
+        {   
+            steps++;
             if (table[hash] == *key && status[hash] == 1)
             {
                 return value[hash];
             }
             else
             {
-                return colFind(hash, key);
+                return colFind(hash, key, steps);
             }
         }
         else return -1;
     }
 
-    int colFind(int hash, Order* key)
+    int colFind(int hash, Order* key, int& steps)
     {
         int i = 1;
         int col = CollideFunc(hash, i);
-        while (status[col] != 0 && i <= _size && !(table[col] == *key && status[col] == 1))col = CollideFunc(hash, ++i);
+        while (status[col] != 0 && i <= _size && !(table[col] == *key && status[col] == 1)) { col = CollideFunc(hash, ++i); steps++; }
         if (table[col] == *key && status[col] == 1)return value[col];
         else return -1;
     }
@@ -1687,6 +1712,8 @@ public:
         value = new int[newSize];
         status = new char[newSize];
         _size = newSize;
+        c1 = Prime(2, this->_size);
+        c2 = Prime(c1, this->_size);
         count = 0;
         memset(status, 0, _size);
         for (int i = 0; i < oldSize; i++) { if (oldStatus[i] == 1) { Add(&oldTable[i], oldValue[i]); } };
@@ -1856,25 +1883,29 @@ public:
 
     }
     //ïîèñê
-    int search(std::string userInput)
+    int search(std::string userInput, int& steps)
     {
         int hash = FisrtHashFunction(userInput);
         //òîæå ñàìîå ÷òî è äî ýòîãî áûëî
+        steps++;
         if (userInput == table[hash]._data && table[hash]._status == 1) {
             //cout << "Ñóùåñòâóåò" << endl;
             return table[hash]._value;
         }
         else
 
-            return collisionSearch(hash, userInput);
+            return collisionSearch(hash, userInput, steps);
     }
     // ôîð çàìåíèòü íà âàéë, èäåì ïîêà êîëè÷åñòâî ïîïûòîê âñòàêâè íå ïðåâûñÿò ðàçìåðíîñòü òàáëèöû èëè íå íàøåë òàêîé æå
-    int collisionSearch(int hash, std::string userInput)
+    int collisionSearch(int hash, std::string userInput, int& steps)
     {
         int hash2 = SecondHashFunction(userInput);
         int i = 1;
         int collision = CollisionFunction(hash, hash2, i);
-        while (table[collision]._status != 0 && !(userInput == table[collision]._data) && i <= size)collision = CollisionFunction(hash, hash2, ++i);
+        while (table[collision]._status != 0 && !(userInput == table[collision]._data) && i <= size) {
+            collision = CollisionFunction(hash, hash2, ++i);
+            steps++;
+        }
         if (userInput == table[collision]._data)
         {
             //cout << "Ñóùåñòâóåò" << endl;
@@ -1890,7 +1921,7 @@ public:
         std::string res = "";
         for (int i = 0; i < size; i++)
         {
-            if (table[i]._status == 1)res +=  table[i]._data + " = " + std::to_string(table[i]._value) + "\n";
+            if (table[i]._status == 1)res += std::to_string(i) + ": " + table[i]._data + " = " + std::to_string(table[i]._value+1) + "\n";
         }
         return res;
     }
@@ -1921,6 +1952,19 @@ public:
         status = new int[size];
         value = new int[size];
         for (int i = 0; i < size; i++) { status[i] = 0; }
+        this->k = Prime(this->size);
+    }
+
+    int Prime(int index)
+    {
+        for (int i = 2; i < index; i++)
+        {
+            if (index % i != 0)
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     void setK(int a)
@@ -1970,7 +2014,7 @@ public:
         std::string res = "";
         for (int i = 0; i < size; i++)
         {
-            if (status[i] == 1)res += data[i] + " = " + std::to_string(value[i]) + "\n";
+            if (status[i] == 1)res += std::to_string(i) + ": " + data[i] + " = " + std::to_string(value[i] + 1) + "\n";
         }
         return res;
     }
@@ -2105,6 +2149,7 @@ public:
         value = new int[newsize];
         if (newsize < usersize)size = usersize;
         else size = newsize;
+        this->k = Prime(this->size);
         count = 0;
         for (int i = 0; i < size; i++)status[i] = 0;
         //for(int i = 0; i < size; i++)std::cout<< oldStatus[i]<< std::endl;
@@ -2119,7 +2164,7 @@ public:
         delete[] OldValue;
     }
 
-    int find(std::string* object)
+    int find(std::string* object, int& steps)
     {
         int attempt = 0;
         int index = primary_hash(object);
@@ -2127,6 +2172,7 @@ public:
         if (status[index] == 1 && data[index] == *object)
         {
             //cout << "Ýëåìåíò áûë íàéäåí." << endl;
+            steps++;
             return value[index];
         }
         else
@@ -2135,6 +2181,7 @@ public:
             {
                 step = secondary_hash(index, attempt, k);
                 attempt++;
+                steps++; 
                 if (attempt > size || status[step] == 0)
                 {
                     //cout << "Ýëåìåíò íå áûë íàéäåí." << endl;
